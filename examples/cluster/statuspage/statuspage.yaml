@@ -1,0 +1,29 @@
+apiVersion: statuspage.rootly.crossplane.io/v1alpha1
+kind: StatusPage
+metadata:
+  name: public
+spec:
+  forProvider:
+    title: Example Status
+    publicTitle: Example Status
+    description: Current state of the Example platform.
+    enabled: true
+    public: true
+    showUptime: true
+    showUptimeLastDays: 90
+    timeZone: America/Los_Angeles
+    # The services and functionalities the page reports on.
+    serviceIdsRefs:
+      - name: authorization-server
+    functionalityIdsRefs:
+      - name: sign-in
+    # A password-protected page takes its password from a secret, never from
+    # the spec:
+    #   authenticationEnabled: true
+    #   authenticationMethod: password
+    #   authenticationPasswordSecretRef:
+    #     name: status-page
+    #     namespace: crossplane-system
+    #     key: password
+  providerConfigRef:
+    name: default

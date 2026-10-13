@@ -21,14 +21,25 @@ func TestGetProvider(t *testing.T) {
 		shortGroup string
 		kind       string
 	}{
-		"rootly_team":                   {shortGroup: "team", kind: "Team"},
-		"rootly_escalation_policy":      {shortGroup: "escalation", kind: "EscalationPolicy"},
-		"rootly_escalation_level":       {shortGroup: "escalation", kind: "EscalationLevel"},
-		"rootly_schedule":               {shortGroup: "schedule", kind: "Schedule"},
-		"rootly_schedule_rotation":      {shortGroup: "schedule", kind: "ScheduleRotation"},
-		"rootly_schedule_rotation_user": {shortGroup: "schedule", kind: "ScheduleRotationUser"},
-		"rootly_heartbeat":              {shortGroup: "heartbeat", kind: "Heartbeat"},
-		"rootly_alerts_source":          {shortGroup: "alerts", kind: "AlertsSource"},
+		tfTeam:                        {shortGroup: "team", kind: "Team"},
+		tfEscalationPolicy:            {shortGroup: "escalation", kind: "EscalationPolicy"},
+		tfEscalationLevel:             {shortGroup: "escalation", kind: "EscalationLevel"},
+		tfSchedule:                    {shortGroup: "schedule", kind: "Schedule"},
+		tfScheduleRotation:            {shortGroup: "schedule", kind: "ScheduleRotation"},
+		tfScheduleRotationUser:        {shortGroup: "schedule", kind: "ScheduleRotationUser"},
+		tfHeartbeat:                   {shortGroup: "heartbeat", kind: "Heartbeat"},
+		tfAlertsSource:                {shortGroup: "alerts", kind: "AlertsSource"},
+		tfAlertRoute:                  {shortGroup: "alerts", kind: "AlertRoute"},
+		tfService:                     {shortGroup: "service", kind: "Service"},
+		tfFunctionality:               {shortGroup: "service", kind: "Functionality"},
+		tfIncidentType:                {shortGroup: "incident", kind: "IncidentType"},
+		tfSeverity:                    {shortGroup: "incident", kind: "Severity"},
+		tfWorkflowAlert:               {shortGroup: "workflow", kind: "WorkflowAlert"},
+		tfWorkflowTaskCreateIncident:  {shortGroup: "workflow", kind: "WorkflowTaskCreateIncident"},
+		tfWorkflowTaskPublishIncident: {shortGroup: "workflow", kind: "WorkflowTaskPublishIncident"},
+		tfStatusPage:                  {shortGroup: "statuspage", kind: "StatusPage"},
+		tfStatusPageComponent:         {shortGroup: "statuspage", kind: "StatusPageComponent"},
+		tfStatusPageComponentGroup:    {shortGroup: "statuspage", kind: "StatusPageComponentGroup"},
 	}
 
 	tests := []struct {
@@ -88,9 +99,37 @@ func TestGetProvider(t *testing.T) {
 				field    string
 				target   string
 			}{
-				{resource: "rootly_escalation_level", field: "escalation_policy_id", target: "rootly_escalation_policy"},
-				{resource: "rootly_schedule_rotation", field: "schedule_id", target: "rootly_schedule"},
-				{resource: "rootly_schedule_rotation_user", field: "schedule_rotation_id", target: "rootly_schedule_rotation"},
+				{resource: tfEscalationLevel, field: "escalation_policy_id", target: tfEscalationPolicy},
+				{resource: tfScheduleRotation, field: "schedule_id", target: tfSchedule},
+				{resource: tfScheduleRotationUser, field: "schedule_rotation_id", target: tfScheduleRotation},
+				{resource: tfAlertRoute, field: "alerts_source_ids", target: tfAlertsSource},
+				{resource: tfAlertRoute, field: "owning_team_ids", target: tfTeam},
+				{resource: tfAlertRoute, field: "rules.destinations.target_id", target: tfService},
+				{resource: tfService, field: "escalation_policy_id", target: tfEscalationPolicy},
+				{resource: tfService, field: "owner_group_ids", target: tfTeam},
+				{resource: tfFunctionality, field: "escalation_policy_id", target: tfEscalationPolicy},
+				{resource: tfFunctionality, field: "owner_group_ids", target: tfTeam},
+				{resource: tfFunctionality, field: "service_ids", target: tfService},
+				{resource: tfWorkflowAlert, field: "group_ids", target: tfTeam},
+				{resource: tfWorkflowAlert, field: "service_ids", target: tfService},
+				{resource: tfWorkflowAlert, field: "functionality_ids", target: tfFunctionality},
+				{resource: tfWorkflowAlert, field: "incident_type_ids", target: tfIncidentType},
+				{resource: tfWorkflowAlert, field: "severity_ids", target: tfSeverity},
+				{resource: tfWorkflowTaskCreateIncident, field: "workflow_id", target: tfWorkflowAlert},
+				{resource: tfWorkflowTaskCreateIncident, field: "task_params.group_ids", target: tfTeam},
+				{resource: tfWorkflowTaskCreateIncident, field: "task_params.service_ids", target: tfService},
+				{resource: tfWorkflowTaskCreateIncident, field: "task_params.functionality_ids", target: tfFunctionality},
+				{resource: tfWorkflowTaskCreateIncident, field: "task_params.incident_type_ids", target: tfIncidentType},
+				{resource: tfWorkflowTaskCreateIncident, field: "task_params.severity_id", target: tfSeverity},
+				{resource: tfWorkflowTaskPublishIncident, field: "workflow_id", target: tfWorkflowAlert},
+				{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_id", target: tfStatusPage},
+				{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_ids", target: tfStatusPage},
+				{resource: tfStatusPage, field: "service_ids", target: tfService},
+				{resource: tfStatusPage, field: "functionality_ids", target: tfFunctionality},
+				{resource: tfStatusPageComponentGroup, field: "status_page_id", target: tfStatusPage},
+				{resource: tfStatusPageComponent, field: "status_page_id", target: tfStatusPage},
+				{resource: tfStatusPageComponent, field: "status_page_component_group_id", target: tfStatusPageComponentGroup},
+				{resource: tfStatusPageComponent, field: "source_id", target: tfService},
 			}
 
 			for _, want := range wantReferences {
@@ -105,6 +144,13 @@ func TestGetProvider(t *testing.T) {
 				if ref.TerraformName != want.target {
 					t.Errorf("%s.%s references %q, want %s", want.resource, want.field, ref.TerraformName, want.target)
 				}
+			}
+
+			// Upstream leaves the status page password unflagged. It must
+			// not be generated as a plain spec field.
+			page := p.Resources[tfStatusPage]
+			if !page.TerraformResource.Schema["authentication_password"].Sensitive {
+				t.Error("rootly_status_page.authentication_password is not sensitive")
 			}
 		})
 	}

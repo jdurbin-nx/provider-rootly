@@ -1,0 +1,24 @@
+apiVersion: workflow.rootly.crossplane.io/v1alpha1
+kind: WorkflowTaskCreateIncident
+metadata:
+  name: alert-to-incident-create
+spec:
+  forProvider:
+    name: Create incident
+    position: 1
+    enabled: true
+    skipOnFailure: false
+    # The workflow this is a step of, referenced by name.
+    workflowIdRef:
+      name: alert-to-incident
+    taskParams:
+      - title: "{{ alert.summary }}"
+        summary: "{{ alert.description }}"
+        serviceIdsRefs:
+          - name: authorization-server
+        severityIdRef:
+          name: sev1
+        incidentTypeIdsRefs:
+          - name: outage
+  providerConfigRef:
+    name: default

@@ -1,0 +1,12 @@
+apiVersion: incident.rootly.crossplane.io/v1alpha1
+kind: Severity
+metadata:
+  name: sev1
+spec:
+  forProvider:
+    name: SEV1
+    severity: high
+    description: Customer-facing degradation of a production service.
+    color: "#E8541E"
+  providerConfigRef:
+    name: default

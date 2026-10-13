@@ -45,7 +45,7 @@ func TestExternalNameConfigurations(t *testing.T) {
 	}{
 		{
 			name:         "ConfiguredResourceGetsIdentifierFromProvider",
-			resource:     "rootly_team",
+			resource:     tfTeam,
 			wantDisabled: true,
 		},
 		{

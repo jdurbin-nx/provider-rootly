@@ -44,16 +44,16 @@ func TestDescribeKinds(t *testing.T) {
 	}{
 		{
 			name:     "ResourceWithoutScrapedMetadata",
-			resource: &ujconfig.Resource{Name: "rootly_team"},
-			want:     KindDescriptions["rootly_team"],
+			resource: &ujconfig.Resource{Name: tfTeam},
+			want:     KindDescriptions[tfTeam],
 		},
 		{
 			name: "ScrapedDescriptionIsReplaced",
 			resource: &ujconfig.Resource{
-				Name:         "rootly_schedule_rotation",
+				Name:         tfScheduleRotation,
 				MetaResource: &registry.Resource{Description: "Manages a schedule rotation."},
 			},
-			want: KindDescriptions["rootly_schedule_rotation"],
+			want: KindDescriptions[tfScheduleRotation],
 		},
 	}
 

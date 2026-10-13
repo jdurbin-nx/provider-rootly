@@ -12,11 +12,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Configure only registers configurator callbacks; they run inside
-// ConfigureResources. So the test drives the same pipeline the provider
-// does, on the real committed schema.
-func TestConfigure(t *testing.T) {
-	t.Parallel()
+// generated is every resource this provider generates, as the include list
+// the provider builds from its external-name table.
+var generated = []string{
+	tfTeam, tfEscalationPolicy, tfEscalationLevel,
+	tfSchedule, tfScheduleRotation, tfScheduleRotationUser,
+	tfHeartbeat, tfAlertsSource, tfAlertRoute,
+	tfService, tfFunctionality, tfIncidentType, tfSeverity,
+	tfWorkflowAlert, tfWorkflowTaskCreateIncident, tfWorkflowTaskPublishIncident,
+	tfStatusPage, tfStatusPageComponent, tfStatusPageComponentGroup,
+}
+
+// configuredProvider runs the same pipeline the provider does, on the real
+// committed schema. Configure only registers configurator callbacks; they
+// run inside ConfigureResources.
+func configuredProvider(t *testing.T) (p *ujconfig.Provider) {
+	t.Helper()
 
 	schema, err := os.ReadFile("../../schema.json")
 	if err != nil {
@@ -27,16 +38,25 @@ func TestConfigure(t *testing.T) {
 		t.Fatalf("cannot read provider metadata: %v", err)
 	}
 
-	p := ujconfig.NewProvider(schema, "rootly", "github.com/nikogura/provider-rootly", meta,
+	include := make([]string, len(generated))
+	for i, name := range generated {
+		include[i] = name + "$"
+	}
+
+	p = ujconfig.NewProvider(schema, "rootly", "github.com/nikogura/provider-rootly", meta,
 		ujconfig.WithRootGroup("rootly.crossplane.io"),
-		ujconfig.WithIncludeList([]string{
-			"rootly_team$", "rootly_escalation_policy$", "rootly_escalation_level$",
-			"rootly_schedule$", "rootly_schedule_rotation$", "rootly_schedule_rotation_user$",
-			"rootly_heartbeat$", "rootly_alerts_source$",
-		}))
+		ujconfig.WithIncludeList(include))
 
 	Configure(p)
 	p.ConfigureResources()
+
+	return p
+}
+
+func TestConfigureNamesEveryKind(t *testing.T) {
+	t.Parallel()
+
+	p := configuredProvider(t)
 
 	tests := []struct {
 		name       string
@@ -44,14 +64,29 @@ func TestConfigure(t *testing.T) {
 		shortGroup string
 		kind       string
 	}{
-		{name: "Team", resource: "rootly_team", shortGroup: "team", kind: "Team"},
-		{name: "EscalationPolicy", resource: "rootly_escalation_policy", shortGroup: "escalation", kind: "EscalationPolicy"},
-		{name: "EscalationLevel", resource: "rootly_escalation_level", shortGroup: "escalation", kind: "EscalationLevel"},
-		{name: "Schedule", resource: "rootly_schedule", shortGroup: "schedule", kind: "Schedule"},
-		{name: "ScheduleRotation", resource: "rootly_schedule_rotation", shortGroup: "schedule", kind: "ScheduleRotation"},
-		{name: "ScheduleRotationUser", resource: "rootly_schedule_rotation_user", shortGroup: "schedule", kind: "ScheduleRotationUser"},
-		{name: "Heartbeat", resource: "rootly_heartbeat", shortGroup: "heartbeat", kind: "Heartbeat"},
-		{name: "AlertsSource", resource: "rootly_alerts_source", shortGroup: "alerts", kind: "AlertsSource"},
+		{name: "Team", resource: tfTeam, shortGroup: "team", kind: "Team"},
+		{name: "EscalationPolicy", resource: tfEscalationPolicy, shortGroup: "escalation", kind: "EscalationPolicy"},
+		{name: "EscalationLevel", resource: tfEscalationLevel, shortGroup: "escalation", kind: "EscalationLevel"},
+		{name: "Schedule", resource: tfSchedule, shortGroup: "schedule", kind: "Schedule"},
+		{name: "ScheduleRotation", resource: tfScheduleRotation, shortGroup: "schedule", kind: "ScheduleRotation"},
+		{name: "ScheduleRotationUser", resource: tfScheduleRotationUser, shortGroup: "schedule", kind: "ScheduleRotationUser"},
+		{name: "Heartbeat", resource: tfHeartbeat, shortGroup: "heartbeat", kind: "Heartbeat"},
+		{name: "AlertsSource", resource: tfAlertsSource, shortGroup: "alerts", kind: "AlertsSource"},
+		{name: "AlertRoute", resource: tfAlertRoute, shortGroup: "alerts", kind: "AlertRoute"},
+		{name: "Service", resource: tfService, shortGroup: "service", kind: "Service"},
+		{name: "Functionality", resource: tfFunctionality, shortGroup: "service", kind: "Functionality"},
+		{name: "IncidentType", resource: tfIncidentType, shortGroup: "incident", kind: "IncidentType"},
+		{name: "Severity", resource: tfSeverity, shortGroup: "incident", kind: "Severity"},
+		{name: "WorkflowAlert", resource: tfWorkflowAlert, shortGroup: "workflow", kind: "WorkflowAlert"},
+		{name: "WorkflowTaskCreateIncident", resource: tfWorkflowTaskCreateIncident, shortGroup: "workflow", kind: "WorkflowTaskCreateIncident"},
+		{name: "WorkflowTaskPublishIncident", resource: tfWorkflowTaskPublishIncident, shortGroup: "workflow", kind: "WorkflowTaskPublishIncident"},
+		{name: "StatusPage", resource: tfStatusPage, shortGroup: "statuspage", kind: "StatusPage"},
+		{name: "StatusPageComponent", resource: tfStatusPageComponent, shortGroup: "statuspage", kind: "StatusPageComponent"},
+		{name: "StatusPageComponentGroup", resource: tfStatusPageComponentGroup, shortGroup: "statuspage", kind: "StatusPageComponentGroup"},
+	}
+
+	if len(tests) != len(generated) {
+		t.Fatalf("%d kinds named, %d generated", len(tests), len(generated))
 	}
 
 	for _, tt := range tests {
@@ -70,28 +105,76 @@ func TestConfigure(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Every id field that names another generated kind resolves it by name,
+// never by a pasted Rootly UUID. A polymorphic field resolves the kind the
+// alerting flow needs.
+func TestConfigureReferences(t *testing.T) {
+	t.Parallel()
+
+	p := configuredProvider(t)
 
 	references := []struct {
 		resource string
 		field    string
 		target   string
 	}{
-		{resource: "rootly_escalation_level", field: "escalation_policy_id", target: "rootly_escalation_policy"},
-		{resource: "rootly_schedule_rotation", field: "schedule_id", target: "rootly_schedule"},
-		{resource: "rootly_schedule_rotation_user", field: "schedule_rotation_id", target: "rootly_schedule_rotation"},
+		{resource: tfEscalationLevel, field: "escalation_policy_id", target: tfEscalationPolicy},
+		{resource: tfScheduleRotation, field: "schedule_id", target: tfSchedule},
+		{resource: tfScheduleRotationUser, field: "schedule_rotation_id", target: tfScheduleRotation},
+		{resource: tfAlertRoute, field: "alerts_source_ids", target: tfAlertsSource},
+		{resource: tfAlertRoute, field: "owning_team_ids", target: tfTeam},
+		{resource: tfAlertRoute, field: "rules.destinations.target_id", target: tfService},
+		{resource: tfService, field: "escalation_policy_id", target: tfEscalationPolicy},
+		{resource: tfService, field: "owner_group_ids", target: tfTeam},
+		{resource: tfFunctionality, field: "escalation_policy_id", target: tfEscalationPolicy},
+		{resource: tfFunctionality, field: "owner_group_ids", target: tfTeam},
+		{resource: tfFunctionality, field: "service_ids", target: tfService},
+		{resource: tfWorkflowAlert, field: "group_ids", target: tfTeam},
+		{resource: tfWorkflowAlert, field: "service_ids", target: tfService},
+		{resource: tfWorkflowAlert, field: "functionality_ids", target: tfFunctionality},
+		{resource: tfWorkflowAlert, field: "incident_type_ids", target: tfIncidentType},
+		{resource: tfWorkflowAlert, field: "severity_ids", target: tfSeverity},
+		{resource: tfWorkflowTaskCreateIncident, field: "workflow_id", target: tfWorkflowAlert},
+		{resource: tfWorkflowTaskCreateIncident, field: "task_params.group_ids", target: tfTeam},
+		{resource: tfWorkflowTaskCreateIncident, field: "task_params.service_ids", target: tfService},
+		{resource: tfWorkflowTaskCreateIncident, field: "task_params.functionality_ids", target: tfFunctionality},
+		{resource: tfWorkflowTaskCreateIncident, field: "task_params.incident_type_ids", target: tfIncidentType},
+		{resource: tfWorkflowTaskCreateIncident, field: "task_params.severity_id", target: tfSeverity},
+		{resource: tfWorkflowTaskPublishIncident, field: "workflow_id", target: tfWorkflowAlert},
+		{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_id", target: tfStatusPage},
+		{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_ids", target: tfStatusPage},
+		{resource: tfStatusPage, field: "service_ids", target: tfService},
+		{resource: tfStatusPage, field: "functionality_ids", target: tfFunctionality},
+		{resource: tfStatusPageComponentGroup, field: "status_page_id", target: tfStatusPage},
+		{resource: tfStatusPageComponent, field: "status_page_id", target: tfStatusPage},
+		{resource: tfStatusPageComponent, field: "status_page_component_group_id", target: tfStatusPageComponentGroup},
+		{resource: tfStatusPageComponent, field: "source_id", target: tfService},
 	}
-
-	ignored := p.Resources["rootly_alerts_source"].LateInitializer.IgnoredFields
-	assert.ElementsMatch(t, []string{"alert_template_attributes", "alert_source_fields_attributes"}, ignored,
-		"the conflicting AlertsSource blocks must not be late-initialized")
 
 	for _, want := range references {
 		ref, ok := p.Resources[want.resource].References[want.field]
 		if !ok {
-			t.Fatalf("%s.%s has no cross-resource reference", want.resource, want.field)
+			t.Errorf("%s.%s has no cross-resource reference", want.resource, want.field)
+
+			continue
 		}
 		if ref.TerraformName != want.target {
 			t.Errorf("%s.%s references %q, want %s", want.resource, want.field, ref.TerraformName, want.target)
 		}
 	}
+}
+
+func TestConfigureFieldHandling(t *testing.T) {
+	t.Parallel()
+
+	p := configuredProvider(t)
+
+	ignored := p.Resources[tfAlertsSource].LateInitializer.IgnoredFields
+	assert.ElementsMatch(t, []string{"alert_template_attributes", "alert_source_fields_attributes"}, ignored,
+		"the conflicting AlertsSource blocks must not be late-initialized")
+
+	password := p.Resources[tfStatusPage].TerraformResource.Schema["authentication_password"]
+	assert.True(t, password.Sensitive, "the status page password must be a secret reference, not a spec field")
 }

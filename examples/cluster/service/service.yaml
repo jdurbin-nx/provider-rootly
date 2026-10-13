@@ -1,0 +1,17 @@
+apiVersion: service.rootly.crossplane.io/v1alpha1
+kind: Service
+metadata:
+  name: authorization-server
+spec:
+  forProvider:
+    name: Authorization Server
+    description: Issues and validates access tokens for every API.
+    publicDescription: Sign-in and API access.
+    # Owners and the paging policy are referenced by name, never by pasting
+    # a Rootly UUID; the provider resolves the ids once those objects exist.
+    ownerGroupIdsRefs:
+      - name: platform
+    escalationPolicyIdRef:
+      name: platform-default
+  providerConfigRef:
+    name: default

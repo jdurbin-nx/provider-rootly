@@ -1,0 +1,37 @@
+apiVersion: alerts.rootly.crossplane.io/v1alpha1
+kind: AlertRoute
+metadata:
+  name: prometheus-production
+spec:
+  forProvider:
+    name: Prometheus Production
+    enabled: true
+    # Alerts arriving from these sources are run through the rules.
+    alertsSourceIdsRefs:
+      - name: prometheus
+    owningTeamIdsRefs:
+      - name: platform
+    rules:
+      - name: Authorization server
+        conditionGroups:
+          - position: 1
+            conditions:
+              - propertyFieldType: attribute
+                propertyFieldName: title
+                propertyFieldConditionType: contains
+                propertyFieldValue: authorization-server
+        destinations:
+          # targetType picks the kind. A Service is resolved by name; a
+          # Group, Functionality or EscalationPolicy takes its Rootly id in
+          # targetId.
+          - targetType: Service
+            targetIdRef:
+              name: authorization-server
+      - name: Everything else
+        fallbackRule: true
+        destinations:
+          - targetType: Service
+            targetIdRef:
+              name: authorization-server
+  providerConfigRef:
+    name: default

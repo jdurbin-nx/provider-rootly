@@ -7,9 +7,9 @@ generated with [Upjet](https://github.com/crossplane/upjet) from the official
 Incident-management substrate as managed resources: drive Rootly from git,
 alongside the rest of your infrastructure, with the same reconcile loop.
 
-## Managed resources
+## Managed Resources
 
-The SRE set, deliberately small to start:
+The on-call set, and the kinds that take an alert through to a status page:
 
 | Kind | Group | Terraform resource |
 |---|---|---|
@@ -21,6 +21,17 @@ The SRE set, deliberately small to start:
 | `ScheduleRotationUser` | `schedule.rootly.crossplane.io` | `rootly_schedule_rotation_user` |
 | `Heartbeat` | `heartbeat.rootly.crossplane.io` | `rootly_heartbeat` |
 | `AlertsSource` | `alerts.rootly.crossplane.io` | `rootly_alerts_source` |
+| `AlertRoute` | `alerts.rootly.crossplane.io` | `rootly_alert_route` |
+| `Service` | `service.rootly.crossplane.io` | `rootly_service` |
+| `Functionality` | `service.rootly.crossplane.io` | `rootly_functionality` |
+| `IncidentType` | `incident.rootly.crossplane.io` | `rootly_incident_type` |
+| `Severity` | `incident.rootly.crossplane.io` | `rootly_severity` |
+| `WorkflowAlert` | `workflow.rootly.crossplane.io` | `rootly_workflow_alert` |
+| `WorkflowTaskCreateIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_create_incident` |
+| `WorkflowTaskPublishIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_publish_incident` |
+| `StatusPage` | `statuspage.rootly.crossplane.io` | `rootly_status_page` |
+| `StatusPageComponentGroup` | `statuspage.rootly.crossplane.io` | `rootly_status_page_component_group` |
+| `StatusPageComponent` | `statuspage.rootly.crossplane.io` | `rootly_status_page_component` |
 
 Every kind also exists namespaced under `*.rootly.m.crossplane.io` for
 Crossplane v2 namespaced composition. Rootly assigns every resource its ID, so
@@ -44,6 +55,37 @@ late-initialized, so the spec carries only the one you declare. If an
 `AlertsSource` reports `Conflicting configuration arguments`, an earlier
 provider release late-initialized the other block into its spec: remove the
 block you do not manage from `spec.forProvider` and it reconciles again.
+
+### From An Alert To A Status Page
+
+The kinds compose into one flow, every link by name:
+
+1. An `AlertsSource` receives the alert (for example from Alertmanager).
+2. An `AlertRoute` lists that source in `alertsSourceIdsRefs`; each rule
+   matches on alert fields and sends to a destination, a `Service` named in
+   `targetIdRef`.
+3. A `WorkflowAlert` fires on `alert_created`. Its steps are separate kinds that
+   name it in `workflowIdRef`: a `WorkflowTaskCreateIncident` opens the
+   incident against the `Service`, with a `Severity` and `IncidentType`, and a
+   `WorkflowTaskPublishIncident` posts to the `StatusPage`.
+4. A `StatusPageComponent` mirrors the `Service` on the page, so what the
+   incident touches is what the page shows.
+
+`examples/cluster/` holds one manifest per kind, written as that flow.
+
+Three fields point at a kind chosen by a sibling type field, and a reference
+can only resolve one kind. Each resolves the kind the flow above needs; the
+others take the Rootly id directly:
+
+| Field | Type field | Resolved by reference | Raw id for |
+|---|---|---|---|
+| `AlertRoute` `rules[].destinations[].targetId` | `targetType` | `Service` | `Group`, `Functionality`, `EscalationPolicy` |
+| `StatusPageComponent` `sourceId` | `sourceType` | `Service` | `Functionality` |
+| `WorkflowTask*` `workflowId` | the workflow's genre | `WorkflowAlert` | workflows of other genres |
+
+A `StatusPage` with `authenticationEnabled` takes its password from a secret
+through `authenticationPasswordSecretRef`; upstream does not flag the field as
+sensitive, this provider does, so it never appears in the spec or the status.
 
 The upstream provider covers ~229 resources; widening the scope is one entry in
 `config/external_name.go` and a regenerate.
@@ -90,7 +132,7 @@ spec:
 `api_host` is an optional second key, only for self-hosted or regional
 endpoints; it defaults to `https://api.rootly.com`.
 
-## Adopting an existing Rootly organization
+## Adopting An Existing Rootly Organization
 
 Start observe-only: create MRs with
 `managementPolicies: ["Observe"]` and the `crossplane.io/external-name`

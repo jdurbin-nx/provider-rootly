@@ -1,0 +1,27 @@
+apiVersion: workflow.rootly.crossplane.io/v1alpha1
+kind: WorkflowTaskPublishIncident
+metadata:
+  name: alert-to-incident-publish
+spec:
+  forProvider:
+    name: Publish to status page
+    position: 2
+    enabled: true
+    skipOnFailure: false
+    workflowIdRef:
+      name: alert-to-incident
+    taskParams:
+      - statusPageIdRef:
+          name: public
+        incident:
+          id: "{{ incident.id }}"
+          name: "{{ incident.id }}"
+        publicTitle: "{{ incident.title }}"
+        status: investigating
+        event: |
+          We are investigating {{ incident.title }}.
+
+          Severity: {{ incident.severity }}
+        notifySubscribers: true
+  providerConfigRef:
+    name: default

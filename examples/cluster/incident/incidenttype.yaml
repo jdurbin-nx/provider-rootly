@@ -1,0 +1,11 @@
+apiVersion: incident.rootly.crossplane.io/v1alpha1
+kind: IncidentType
+metadata:
+  name: outage
+spec:
+  forProvider:
+    name: Outage
+    description: A service is down or unusable for customers.
+    color: "#B00020"
+  providerConfigRef:
+    name: default

@@ -13,10 +13,14 @@ import (
 	v1alpha1 "github.com/nikogura/provider-rootly/apis/namespaced/alerts/v1alpha1"
 	v1alpha1escalation "github.com/nikogura/provider-rootly/apis/namespaced/escalation/v1alpha1"
 	v1alpha1heartbeat "github.com/nikogura/provider-rootly/apis/namespaced/heartbeat/v1alpha1"
+	v1alpha1incident "github.com/nikogura/provider-rootly/apis/namespaced/incident/v1alpha1"
 	v1alpha1schedule "github.com/nikogura/provider-rootly/apis/namespaced/schedule/v1alpha1"
+	v1alpha1service "github.com/nikogura/provider-rootly/apis/namespaced/service/v1alpha1"
+	v1alpha1statuspage "github.com/nikogura/provider-rootly/apis/namespaced/statuspage/v1alpha1"
 	v1alpha1team "github.com/nikogura/provider-rootly/apis/namespaced/team/v1alpha1"
 	v1alpha1namespaced "github.com/nikogura/provider-rootly/apis/namespaced/v1alpha1"
 	v1beta1 "github.com/nikogura/provider-rootly/apis/namespaced/v1beta1"
+	v1alpha1workflow "github.com/nikogura/provider-rootly/apis/namespaced/workflow/v1alpha1"
 )
 
 func init() {
@@ -25,10 +29,14 @@ func init() {
 		v1alpha1.SchemeBuilder.AddToScheme,
 		v1alpha1escalation.SchemeBuilder.AddToScheme,
 		v1alpha1heartbeat.SchemeBuilder.AddToScheme,
+		v1alpha1incident.SchemeBuilder.AddToScheme,
 		v1alpha1schedule.SchemeBuilder.AddToScheme,
+		v1alpha1service.SchemeBuilder.AddToScheme,
+		v1alpha1statuspage.SchemeBuilder.AddToScheme,
 		v1alpha1team.SchemeBuilder.AddToScheme,
 		v1alpha1namespaced.SchemeBuilder.AddToScheme,
 		v1beta1.SchemeBuilder.AddToScheme,
+		v1alpha1workflow.SchemeBuilder.AddToScheme,
 	)
 }
 

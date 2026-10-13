@@ -1,0 +1,19 @@
+apiVersion: statuspage.rootly.crossplane.io/v1alpha1
+kind: StatusPageComponent
+metadata:
+  name: public-authorization-server
+spec:
+  forProvider:
+    statusPageIdRef:
+      name: public
+    statusPageComponentGroupIdRef:
+      name: public-platform
+    # A catalog-backed component: its name and description come from the
+    # service it mirrors. sourceType picks the kind; a Service is resolved by
+    # name, a Functionality takes its Rootly id in sourceId.
+    sourceType: Service
+    sourceIdRef:
+      name: authorization-server
+    position: 1
+  providerConfigRef:
+    name: default

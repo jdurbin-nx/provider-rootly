@@ -15,14 +15,25 @@ import (
 // always learned from the provider after creation. This map is also the
 // provider's scope -- only resources listed here are generated.
 var ExternalNameConfigs = map[string]config.ExternalName{
-	"rootly_team":                   config.IdentifierFromProvider,
-	"rootly_escalation_policy":      config.IdentifierFromProvider,
-	"rootly_escalation_level":       config.IdentifierFromProvider,
-	"rootly_schedule":               config.IdentifierFromProvider,
-	"rootly_schedule_rotation":      config.IdentifierFromProvider,
-	"rootly_schedule_rotation_user": config.IdentifierFromProvider,
-	"rootly_heartbeat":              config.IdentifierFromProvider,
-	"rootly_alerts_source":          config.IdentifierFromProvider,
+	tfTeam:                        config.IdentifierFromProvider,
+	tfEscalationPolicy:            config.IdentifierFromProvider,
+	tfEscalationLevel:             config.IdentifierFromProvider,
+	tfSchedule:                    config.IdentifierFromProvider,
+	tfScheduleRotation:            config.IdentifierFromProvider,
+	tfScheduleRotationUser:        config.IdentifierFromProvider,
+	tfHeartbeat:                   config.IdentifierFromProvider,
+	tfAlertsSource:                config.IdentifierFromProvider,
+	tfAlertRoute:                  config.IdentifierFromProvider,
+	tfService:                     config.IdentifierFromProvider,
+	tfFunctionality:               config.IdentifierFromProvider,
+	tfIncidentType:                config.IdentifierFromProvider,
+	tfSeverity:                    config.IdentifierFromProvider,
+	tfWorkflowAlert:               config.IdentifierFromProvider,
+	tfWorkflowTaskCreateIncident:  config.IdentifierFromProvider,
+	tfWorkflowTaskPublishIncident: config.IdentifierFromProvider,
+	tfStatusPage:                  config.IdentifierFromProvider,
+	tfStatusPageComponent:         config.IdentifierFromProvider,
+	tfStatusPageComponentGroup:    config.IdentifierFromProvider,
 }
 
 // ExternalNameConfigurations applies the external name configs listed in the

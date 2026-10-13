@@ -1,0 +1,12 @@
+apiVersion: statuspage.rootly.crossplane.io/v1alpha1
+kind: StatusPageComponentGroup
+metadata:
+  name: public-platform
+spec:
+  forProvider:
+    name: Platform
+    position: 1
+    statusPageIdRef:
+      name: public
+  providerConfigRef:
+    name: default

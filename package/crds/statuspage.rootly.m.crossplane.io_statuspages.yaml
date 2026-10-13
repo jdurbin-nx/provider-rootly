@@ -1,0 +1,902 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: statuspages.statuspage.rootly.m.crossplane.io
+spec:
+  group: statuspage.rootly.m.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - rootly
+    kind: StatusPage
+    listKind: StatusPageList
+    plural: statuspages
+    singular: statuspage
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'StatusPage is the Schema for the StatusPages API. A status page:
+          a public or authenticated page reporting the state of services and functionalities.'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StatusPageSpec defines the desired state of StatusPage
+            properties:
+              forProvider:
+                properties:
+                  allowSearchEngineIndex:
+                    description: Allow search engines to include your public status
+                      page in search results. Value must be one of true or false
+                    type: boolean
+                  authenticationEnabled:
+                    description: Enable authentication (deprecated - use authentication_method
+                      instead). Value must be one of true or false
+                    type: boolean
+                  authenticationMethod:
+                    description: Authentication method. Value must be one of `none`,
+                      `password`, `saml`.
+                    type: string
+                  authenticationPasswordSecretRef:
+                    description: Authentication password
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  description:
+                    description: The description of the status page
+                    type: string
+                  enabled:
+                    type: boolean
+                  externalDomainNames:
+                    description: External domain names attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  failureMessage:
+                    description: Message showing when at least one component is not
+                      operational
+                    type: string
+                  footerColor:
+                    description: The color of the footer. Eg. "#1F2F41"
+                    type: string
+                  functionalityIds:
+                    description: Functionalities attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  functionalityIdsRefs:
+                    description: References to Functionality in service to populate
+                      functionalityIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  functionalityIdsSelector:
+                    description: Selector for a list of Functionality in service to
+                      populate functionalityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  gaTrackingId:
+                    description: Google Analytics tracking ID
+                    type: string
+                  headerColor:
+                    description: The color of the header. Eg. "#0061F2"
+                    type: string
+                  public:
+                    description: Make the status page accessible to the public. Value
+                      must be one of true or false
+                    type: boolean
+                  publicDescription:
+                    description: The public description of the status page
+                    type: string
+                  publicTitle:
+                    description: The public title of the status page
+                    type: string
+                  samlIdpCert:
+                    description: SAML IdP certificate
+                    type: string
+                  samlIdpCertFingerprint:
+                    description: SAML IdP certificate fingerprint
+                    type: string
+                  samlIdpSloServiceUrl:
+                    description: SAML IdP SLO service URL
+                    type: string
+                  samlIdpSsoServiceUrl:
+                    description: SAML IdP SSO service URL
+                    type: string
+                  samlNameIdentifierFormat:
+                    description: SAML name identifier format. Value must be one of
+                      `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`, `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`,
+                      `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`, `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`.
+                    type: string
+                  sectionOrder:
+                    description: Order of sections on the status page. Value must
+                      be a list of `maintenance`, `system_status`, `incidents`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    description: Services attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  showUptime:
+                    description: Show uptime. Value must be one of true or false
+                    type: boolean
+                  showUptimeLastDays:
+                    description: Show uptime over x days. Value must be one of `30`,
+                      `60`, `90`.
+                    type: number
+                  slug:
+                    description: The slug of the status page
+                    type: string
+                  successMessage:
+                    description: Message showing when all components are operational
+                    type: string
+                  timeZone:
+                    description: A valid IANA time zone name.
+                    type: string
+                  title:
+                    description: The title of the status page
+                    type: string
+                  websitePrivacyUrl:
+                    description: Website Privacy URL
+                    type: string
+                  websiteSupportUrl:
+                    description: Website Support URL
+                    type: string
+                  websiteUrl:
+                    description: Website URL
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  allowSearchEngineIndex:
+                    description: Allow search engines to include your public status
+                      page in search results. Value must be one of true or false
+                    type: boolean
+                  authenticationEnabled:
+                    description: Enable authentication (deprecated - use authentication_method
+                      instead). Value must be one of true or false
+                    type: boolean
+                  authenticationMethod:
+                    description: Authentication method. Value must be one of `none`,
+                      `password`, `saml`.
+                    type: string
+                  authenticationPasswordSecretRef:
+                    description: Authentication password
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  description:
+                    description: The description of the status page
+                    type: string
+                  enabled:
+                    type: boolean
+                  externalDomainNames:
+                    description: External domain names attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  failureMessage:
+                    description: Message showing when at least one component is not
+                      operational
+                    type: string
+                  footerColor:
+                    description: The color of the footer. Eg. "#1F2F41"
+                    type: string
+                  functionalityIds:
+                    description: Functionalities attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  functionalityIdsRefs:
+                    description: References to Functionality in service to populate
+                      functionalityIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  functionalityIdsSelector:
+                    description: Selector for a list of Functionality in service to
+                      populate functionalityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  gaTrackingId:
+                    description: Google Analytics tracking ID
+                    type: string
+                  headerColor:
+                    description: The color of the header. Eg. "#0061F2"
+                    type: string
+                  public:
+                    description: Make the status page accessible to the public. Value
+                      must be one of true or false
+                    type: boolean
+                  publicDescription:
+                    description: The public description of the status page
+                    type: string
+                  publicTitle:
+                    description: The public title of the status page
+                    type: string
+                  samlIdpCert:
+                    description: SAML IdP certificate
+                    type: string
+                  samlIdpCertFingerprint:
+                    description: SAML IdP certificate fingerprint
+                    type: string
+                  samlIdpSloServiceUrl:
+                    description: SAML IdP SLO service URL
+                    type: string
+                  samlIdpSsoServiceUrl:
+                    description: SAML IdP SSO service URL
+                    type: string
+                  samlNameIdentifierFormat:
+                    description: SAML name identifier format. Value must be one of
+                      `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`, `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`,
+                      `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`, `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`.
+                    type: string
+                  sectionOrder:
+                    description: Order of sections on the status page. Value must
+                      be a list of `maintenance`, `system_status`, `incidents`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    description: Services attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  showUptime:
+                    description: Show uptime. Value must be one of true or false
+                    type: boolean
+                  showUptimeLastDays:
+                    description: Show uptime over x days. Value must be one of `30`,
+                      `60`, `90`.
+                    type: number
+                  slug:
+                    description: The slug of the status page
+                    type: string
+                  successMessage:
+                    description: Message showing when all components are operational
+                    type: string
+                  timeZone:
+                    description: A valid IANA time zone name.
+                    type: string
+                  title:
+                    description: The title of the status page
+                    type: string
+                  websitePrivacyUrl:
+                    description: Website Privacy URL
+                    type: string
+                  websiteSupportUrl:
+                    description: Website Support URL
+                    type: string
+                  websiteUrl:
+                    description: Website URL
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  kind: ClusterProviderConfig
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  kind:
+                    description: Kind of the referenced object.
+                    type: string
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.title is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.title)
+                || (has(self.initProvider) && has(self.initProvider.title))'
+          status:
+            description: StatusPageStatus defines the observed state of StatusPage.
+            properties:
+              atProvider:
+                properties:
+                  allowSearchEngineIndex:
+                    description: Allow search engines to include your public status
+                      page in search results. Value must be one of true or false
+                    type: boolean
+                  authenticationEnabled:
+                    description: Enable authentication (deprecated - use authentication_method
+                      instead). Value must be one of true or false
+                    type: boolean
+                  authenticationMethod:
+                    description: Authentication method. Value must be one of `none`,
+                      `password`, `saml`.
+                    type: string
+                  cnameRecords:
+                    additionalProperties:
+                      type: string
+                    description: CNAME records mapping external domain names to their
+                      DNS target values. Populated asynchronously after setting external_domain_names.
+                    type: object
+                    x-kubernetes-map-type: granular
+                  description:
+                    description: The description of the status page
+                    type: string
+                  enabled:
+                    type: boolean
+                  externalDomainNames:
+                    description: External domain names attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  failureMessage:
+                    description: Message showing when at least one component is not
+                      operational
+                    type: string
+                  footerColor:
+                    description: The color of the footer. Eg. "#1F2F41"
+                    type: string
+                  functionalityIds:
+                    description: Functionalities attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  gaTrackingId:
+                    description: Google Analytics tracking ID
+                    type: string
+                  headerColor:
+                    description: The color of the header. Eg. "#0061F2"
+                    type: string
+                  id:
+                    type: string
+                  public:
+                    description: Make the status page accessible to the public. Value
+                      must be one of true or false
+                    type: boolean
+                  publicDescription:
+                    description: The public description of the status page
+                    type: string
+                  publicTitle:
+                    description: The public title of the status page
+                    type: string
+                  samlIdpCert:
+                    description: SAML IdP certificate
+                    type: string
+                  samlIdpCertFingerprint:
+                    description: SAML IdP certificate fingerprint
+                    type: string
+                  samlIdpSloServiceUrl:
+                    description: SAML IdP SLO service URL
+                    type: string
+                  samlIdpSsoServiceUrl:
+                    description: SAML IdP SSO service URL
+                    type: string
+                  samlNameIdentifierFormat:
+                    description: SAML name identifier format. Value must be one of
+                      `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`, `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`,
+                      `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`, `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`.
+                    type: string
+                  sectionOrder:
+                    description: Order of sections on the status page. Value must
+                      be a list of `maintenance`, `system_status`, `incidents`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    description: Services attached to the status page
+                    items:
+                      type: string
+                    type: array
+                  showUptime:
+                    description: Show uptime. Value must be one of true or false
+                    type: boolean
+                  showUptimeLastDays:
+                    description: Show uptime over x days. Value must be one of `30`,
+                      `60`, `90`.
+                    type: number
+                  slug:
+                    description: The slug of the status page
+                    type: string
+                  successMessage:
+                    description: Message showing when all components are operational
+                    type: string
+                  timeZone:
+                    description: A valid IANA time zone name.
+                    type: string
+                  title:
+                    description: The title of the status page
+                    type: string
+                  websitePrivacyUrl:
+                    description: Website Privacy URL
+                    type: string
+                  websiteSupportUrl:
+                    description: Website Support URL
+                    type: string
+                  websiteUrl:
+                    description: Website URL
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile-requested-at annotation token that the controller has
+                  processed. Users can compare this to the annotation to determine
+                  whether a reconcile request has been handled.
+                type: string
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

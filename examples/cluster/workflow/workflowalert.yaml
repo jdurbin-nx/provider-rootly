@@ -1,0 +1,17 @@
+apiVersion: workflow.rootly.crossplane.io/v1alpha1
+kind: WorkflowAlert
+metadata:
+  name: alert-to-incident
+spec:
+  forProvider:
+    name: Alert to incident
+    description: Opens and publishes an incident for every production alert.
+    enabled: true
+    triggerParams:
+      - triggers:
+          - alert_created
+        alertConditionSource: IS
+        alertSources:
+          - Prometheus
+  providerConfigRef:
+    name: default

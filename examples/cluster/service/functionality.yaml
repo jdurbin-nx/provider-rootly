@@ -1,0 +1,15 @@
+apiVersion: service.rootly.crossplane.io/v1alpha1
+kind: Functionality
+metadata:
+  name: sign-in
+spec:
+  forProvider:
+    name: Sign-In
+    description: Customers can sign in and stay signed in.
+    # The services that deliver this capability.
+    serviceIdsRefs:
+      - name: authorization-server
+    ownerGroupIdsRefs:
+      - name: platform
+  providerConfigRef:
+    name: default

@@ -1,0 +1,1029 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: functionalities.service.rootly.m.crossplane.io
+spec:
+  group: service.rootly.m.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - rootly
+    kind: Functionality
+    listKind: FunctionalityList
+    plural: functionalities
+    singular: functionality
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'Functionality is the Schema for the Functionalitys API. A functionality:
+          a customer-facing capability, such as Login or Checkout, made up of one
+          or more services.'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FunctionalitySpec defines the desired state of Functionality
+            properties:
+              forProvider:
+                properties:
+                  backstageId:
+                    description: 'The Backstage entity id associated to this functionality.
+                      eg: :namespace/:kind/:entity_name'
+                    type: string
+                  color:
+                    description: The hex color of the functionality
+                    type: string
+                  cortexId:
+                    description: The Cortex group id associated to this functionality
+                    type: string
+                  description:
+                    description: The description of the functionality
+                    type: string
+                  environmentIds:
+                    description: Environments associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  escalationPolicyId:
+                    description: The escalation policy id of the functionality
+                    type: string
+                  escalationPolicyIdRef:
+                    description: Reference to a EscalationPolicy in escalation to
+                      populate escalationPolicyId.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      namespace:
+                        description: Namespace of the referenced object
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  escalationPolicyIdSelector:
+                    description: Selector for a EscalationPolicy in escalation to
+                      populate escalationPolicyId.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  externalId:
+                    description: The external id associated to this functionality
+                    type: string
+                  name:
+                    description: The name of the functionality
+                    type: string
+                  notifyEmails:
+                    description: Emails attached to the functionality
+                    items:
+                      type: string
+                    type: array
+                  opsgenieId:
+                    description: The Opsgenie service id associated to this functionality
+                    type: string
+                  opsgenieTeamId:
+                    description: The Opsgenie team id associated to this functionality
+                    type: string
+                  ownerGroupIds:
+                    description: Owner Teams associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  ownerGroupIdsRefs:
+                    description: References to Team in team to populate ownerGroupIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  ownerGroupIdsSelector:
+                    description: Selector for a list of Team in team to populate ownerGroupIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  ownerUserIds:
+                    description: Owner Users associated with this functionality
+                    items:
+                      type: number
+                    type: array
+                  pagerdutyId:
+                    description: The PagerDuty service id associated to this functionality
+                    type: string
+                  position:
+                    description: Position of the functionality
+                    type: number
+                  properties:
+                    description: Array of property values for this functionality.
+                    items:
+                      properties:
+                        catalogPropertyId:
+                          description: Catalog property ID
+                          type: string
+                        value:
+                          description: The property value
+                          type: string
+                      type: object
+                    type: array
+                  publicDescription:
+                    description: The status page description of the functionality
+                    type: string
+                  serviceIds:
+                    description: Services associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  serviceNowCiSysId:
+                    description: The Service Now CI sys id associated to this functionality
+                    type: string
+                  slackAliases:
+                    description: Slack Aliases associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack alias ID
+                          type: string
+                        name:
+                          description: Slack alias name
+                          type: string
+                      type: object
+                    type: array
+                  slackChannels:
+                    description: Slack Channels associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack channel ID
+                          type: string
+                        name:
+                          description: Slack channel name
+                          type: string
+                      type: object
+                    type: array
+                  slug:
+                    description: The slug of the functionality
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  backstageId:
+                    description: 'The Backstage entity id associated to this functionality.
+                      eg: :namespace/:kind/:entity_name'
+                    type: string
+                  color:
+                    description: The hex color of the functionality
+                    type: string
+                  cortexId:
+                    description: The Cortex group id associated to this functionality
+                    type: string
+                  description:
+                    description: The description of the functionality
+                    type: string
+                  environmentIds:
+                    description: Environments associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  escalationPolicyId:
+                    description: The escalation policy id of the functionality
+                    type: string
+                  escalationPolicyIdRef:
+                    description: Reference to a EscalationPolicy in escalation to
+                      populate escalationPolicyId.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      namespace:
+                        description: Namespace of the referenced object
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  escalationPolicyIdSelector:
+                    description: Selector for a EscalationPolicy in escalation to
+                      populate escalationPolicyId.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  externalId:
+                    description: The external id associated to this functionality
+                    type: string
+                  name:
+                    description: The name of the functionality
+                    type: string
+                  notifyEmails:
+                    description: Emails attached to the functionality
+                    items:
+                      type: string
+                    type: array
+                  opsgenieId:
+                    description: The Opsgenie service id associated to this functionality
+                    type: string
+                  opsgenieTeamId:
+                    description: The Opsgenie team id associated to this functionality
+                    type: string
+                  ownerGroupIds:
+                    description: Owner Teams associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  ownerGroupIdsRefs:
+                    description: References to Team in team to populate ownerGroupIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  ownerGroupIdsSelector:
+                    description: Selector for a list of Team in team to populate ownerGroupIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  ownerUserIds:
+                    description: Owner Users associated with this functionality
+                    items:
+                      type: number
+                    type: array
+                  pagerdutyId:
+                    description: The PagerDuty service id associated to this functionality
+                    type: string
+                  position:
+                    description: Position of the functionality
+                    type: number
+                  properties:
+                    description: Array of property values for this functionality.
+                    items:
+                      properties:
+                        catalogPropertyId:
+                          description: Catalog property ID
+                          type: string
+                        value:
+                          description: The property value
+                          type: string
+                      type: object
+                    type: array
+                  publicDescription:
+                    description: The status page description of the functionality
+                    type: string
+                  serviceIds:
+                    description: Services associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A NamespacedReference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        namespace:
+                          description: Namespace of the referenced object
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      namespace:
+                        description: Namespace for the selector
+                        type: string
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  serviceNowCiSysId:
+                    description: The Service Now CI sys id associated to this functionality
+                    type: string
+                  slackAliases:
+                    description: Slack Aliases associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack alias ID
+                          type: string
+                        name:
+                          description: Slack alias name
+                          type: string
+                      type: object
+                    type: array
+                  slackChannels:
+                    description: Slack Channels associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack channel ID
+                          type: string
+                        name:
+                          description: Slack channel name
+                          type: string
+                      type: object
+                    type: array
+                  slug:
+                    description: The slug of the functionality
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  kind: ClusterProviderConfig
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  kind:
+                    description: Kind of the referenced object.
+                    type: string
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.name is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
+                || (has(self.initProvider) && has(self.initProvider.name))'
+          status:
+            description: FunctionalityStatus defines the observed state of Functionality.
+            properties:
+              atProvider:
+                properties:
+                  backstageId:
+                    description: 'The Backstage entity id associated to this functionality.
+                      eg: :namespace/:kind/:entity_name'
+                    type: string
+                  color:
+                    description: The hex color of the functionality
+                    type: string
+                  cortexId:
+                    description: The Cortex group id associated to this functionality
+                    type: string
+                  description:
+                    description: The description of the functionality
+                    type: string
+                  environmentIds:
+                    description: Environments associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  escalationPolicyId:
+                    description: The escalation policy id of the functionality
+                    type: string
+                  externalId:
+                    description: The external id associated to this functionality
+                    type: string
+                  id:
+                    type: string
+                  managedBy:
+                    description: Read-only..
+                    type: string
+                  name:
+                    description: The name of the functionality
+                    type: string
+                  notifyEmails:
+                    description: Emails attached to the functionality
+                    items:
+                      type: string
+                    type: array
+                  opsgenieId:
+                    description: The Opsgenie service id associated to this functionality
+                    type: string
+                  opsgenieTeamId:
+                    description: The Opsgenie team id associated to this functionality
+                    type: string
+                  ownerGroupIds:
+                    description: Owner Teams associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  ownerUserIds:
+                    description: Owner Users associated with this functionality
+                    items:
+                      type: number
+                    type: array
+                  pagerdutyId:
+                    description: The PagerDuty service id associated to this functionality
+                    type: string
+                  position:
+                    description: Position of the functionality
+                    type: number
+                  properties:
+                    description: Array of property values for this functionality.
+                    items:
+                      properties:
+                        catalogPropertyId:
+                          description: Catalog property ID
+                          type: string
+                        value:
+                          description: The property value
+                          type: string
+                      type: object
+                    type: array
+                  publicDescription:
+                    description: The status page description of the functionality
+                    type: string
+                  serviceIds:
+                    description: Services associated with this functionality
+                    items:
+                      type: string
+                    type: array
+                  serviceNowCiSysId:
+                    description: The Service Now CI sys id associated to this functionality
+                    type: string
+                  slackAliases:
+                    description: Slack Aliases associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack alias ID
+                          type: string
+                        name:
+                          description: Slack alias name
+                          type: string
+                      type: object
+                    type: array
+                  slackChannels:
+                    description: Slack Channels associated with this functionality
+                    items:
+                      properties:
+                        id:
+                          description: Slack channel ID
+                          type: string
+                        name:
+                          description: Slack channel name
+                          type: string
+                      type: object
+                    type: array
+                  slug:
+                    description: The slug of the functionality
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile-requested-at annotation token that the controller has
+                  processed. Users can compare this to the annotation to determine
+                  whether a reconcile request has been handled.
+                type: string
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
