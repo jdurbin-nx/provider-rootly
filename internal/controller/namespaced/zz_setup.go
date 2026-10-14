@@ -11,6 +11,7 @@ import (
 
 	alertroute "github.com/nikogura/provider-rootly/internal/controller/namespaced/alerts/alertroute"
 	alertssource "github.com/nikogura/provider-rootly/internal/controller/namespaced/alerts/alertssource"
+	alerturgency "github.com/nikogura/provider-rootly/internal/controller/namespaced/alerts/alerturgency"
 	escalationlevel "github.com/nikogura/provider-rootly/internal/controller/namespaced/escalation/escalationlevel"
 	escalationpolicy "github.com/nikogura/provider-rootly/internal/controller/namespaced/escalation/escalationpolicy"
 	heartbeat "github.com/nikogura/provider-rootly/internal/controller/namespaced/heartbeat/heartbeat"
@@ -28,6 +29,7 @@ import (
 	team "github.com/nikogura/provider-rootly/internal/controller/namespaced/team/team"
 	workflowalert "github.com/nikogura/provider-rootly/internal/controller/namespaced/workflow/workflowalert"
 	workflowtaskcreateincident "github.com/nikogura/provider-rootly/internal/controller/namespaced/workflow/workflowtaskcreateincident"
+	workflowtaskpagerootlyoncallresponders "github.com/nikogura/provider-rootly/internal/controller/namespaced/workflow/workflowtaskpagerootlyoncallresponders"
 	workflowtaskpublishincident "github.com/nikogura/provider-rootly/internal/controller/namespaced/workflow/workflowtaskpublishincident"
 )
 
@@ -37,6 +39,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		alertroute.Setup,
 		alertssource.Setup,
+		alerturgency.Setup,
 		escalationlevel.Setup,
 		escalationpolicy.Setup,
 		heartbeat.Setup,
@@ -54,6 +57,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		team.Setup,
 		workflowalert.Setup,
 		workflowtaskcreateincident.Setup,
+		workflowtaskpagerootlyoncallresponders.Setup,
 		workflowtaskpublishincident.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -69,6 +73,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		alertroute.SetupGated,
 		alertssource.SetupGated,
+		alerturgency.SetupGated,
 		escalationlevel.SetupGated,
 		escalationpolicy.SetupGated,
 		heartbeat.SetupGated,
@@ -86,6 +91,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		team.SetupGated,
 		workflowalert.SetupGated,
 		workflowtaskcreateincident.SetupGated,
+		workflowtaskpagerootlyoncallresponders.SetupGated,
 		workflowtaskpublishincident.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -100,6 +106,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 	for _, setup := range []func(ctrl.Manager) error{
 		alertroute.SetupWebhookWithManager,
 		alertssource.SetupWebhookWithManager,
+		alerturgency.SetupWebhookWithManager,
 		escalationlevel.SetupWebhookWithManager,
 		escalationpolicy.SetupWebhookWithManager,
 		heartbeat.SetupWebhookWithManager,
@@ -117,6 +124,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		team.SetupWebhookWithManager,
 		workflowalert.SetupWebhookWithManager,
 		workflowtaskcreateincident.SetupWebhookWithManager,
+		workflowtaskpagerootlyoncallresponders.SetupWebhookWithManager,
 		workflowtaskpublishincident.SetupWebhookWithManager,
 	} {
 		if err := setup(mgr); err != nil {

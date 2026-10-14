@@ -11,3 +11,6 @@ func (tr *AlertRoute) Hub() {}
 
 // Hub marks this type as a conversion hub.
 func (tr *AlertsSource) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *AlertUrgency) Hub() {}

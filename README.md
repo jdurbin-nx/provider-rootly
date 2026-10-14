@@ -22,6 +22,7 @@ The on-call set, and the kinds that take an alert through to a status page:
 | `Heartbeat` | `heartbeat.rootly.crossplane.io` | `rootly_heartbeat` |
 | `AlertsSource` | `alerts.rootly.crossplane.io` | `rootly_alerts_source` |
 | `AlertRoute` | `alerts.rootly.crossplane.io` | `rootly_alert_route` |
+| `AlertUrgency` | `alerts.rootly.crossplane.io` | `rootly_alert_urgency` |
 | `Service` | `service.rootly.crossplane.io` | `rootly_service` |
 | `Functionality` | `service.rootly.crossplane.io` | `rootly_functionality` |
 | `IncidentType` | `incident.rootly.crossplane.io` | `rootly_incident_type` |
@@ -29,6 +30,7 @@ The on-call set, and the kinds that take an alert through to a status page:
 | `WorkflowAlert` | `workflow.rootly.crossplane.io` | `rootly_workflow_alert` |
 | `WorkflowTaskCreateIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_create_incident` |
 | `WorkflowTaskPublishIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_publish_incident` |
+| `WorkflowTaskPageRootlyOnCallResponders` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_page_rootly_on_call_responders` |
 | `StatusPage` | `statuspage.rootly.crossplane.io` | `rootly_status_page` |
 | `StatusPageComponentGroup` | `statuspage.rootly.crossplane.io` | `rootly_status_page_component_group` |
 | `StatusPageComponent` | `statuspage.rootly.crossplane.io` | `rootly_status_page_component` |
@@ -66,8 +68,10 @@ The kinds compose into one flow, every link by name:
    `targetIdRef`.
 3. A `WorkflowAlert` fires on `alert_created`. Its steps are separate kinds that
    name it in `workflowIdRef`: a `WorkflowTaskCreateIncident` opens the
-   incident against the `Service`, with a `Severity` and `IncidentType`, and a
-   `WorkflowTaskPublishIncident` posts to the `StatusPage`.
+   incident against the `Service`, with a `Severity` and `IncidentType`, a
+   `WorkflowTaskPublishIncident` posts to the `StatusPage`, and a
+   `WorkflowTaskPageRootlyOnCallResponders` pages the on-call responders of
+   a target at an `AlertUrgency`.
 4. A `StatusPageComponent` mirrors the `Service` on the page, so what the
    incident touches is what the page shows.
 
@@ -82,6 +86,12 @@ others take the Rootly id directly:
 | `AlertRoute` `rules[].destinations[].targetId` | `targetType` | `Service` | `Group`, `Functionality`, `EscalationPolicy` |
 | `StatusPageComponent` `sourceId` | `sourceType` | `Service` | `Functionality` |
 | `WorkflowTask*` `workflowId` | the workflow's genre | `WorkflowAlert` | workflows of other genres |
+
+A `WorkflowTaskPageRootlyOnCallResponders` names who it pages in one of five
+maps, `serviceTarget`, `groupTarget`, `functionalityTarget`,
+`escalationPolicyTarget` or `userTarget`, each holding the target's Rootly
+`id` and `name`. A reference resolves a single id field, not a map, so these
+take the id as written.
 
 A `StatusPage` with `authenticationEnabled` takes its password from a secret
 through `authenticationPasswordSecretRef`; upstream does not flag the field as

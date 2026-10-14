@@ -9,9 +9,10 @@ package v1alpha1
 import (
 	"context"
 	reference "github.com/crossplane/crossplane-runtime/v2/pkg/reference"
+	v1alpha13 "github.com/nikogura/provider-rootly/apis/cluster/alerts/v1alpha1"
 	v1alpha12 "github.com/nikogura/provider-rootly/apis/cluster/incident/v1alpha1"
 	v1alpha1 "github.com/nikogura/provider-rootly/apis/cluster/service/v1alpha1"
-	v1alpha13 "github.com/nikogura/provider-rootly/apis/cluster/statuspage/v1alpha1"
+	v1alpha14 "github.com/nikogura/provider-rootly/apis/cluster/statuspage/v1alpha1"
 	v1alpha11 "github.com/nikogura/provider-rootly/apis/cluster/team/v1alpha1"
 	errors "github.com/pkg/errors"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
@@ -432,6 +433,88 @@ func (mg *WorkflowTaskCreateIncident) ResolveReferences(ctx context.Context, c c
 	return nil
 }
 
+// ResolveReferences of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPIResolver(c, mg)
+
+	var rsp reference.ResolutionResponse
+	var err error
+
+	for i3 := 0; i3 < len(mg.Spec.ForProvider.TaskParams); i3++ {
+		rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+			CurrentValue: reference.FromPtrValue(mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyID),
+			Extract:      reference.ExternalName(),
+			Namespace:    mg.GetNamespace(),
+			Reference:    mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyIDRef,
+			Selector:     mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyIDSelector,
+			To: reference.To{
+				List:    &v1alpha13.AlertUrgencyList{},
+				Managed: &v1alpha13.AlertUrgency{},
+			},
+		})
+		if err != nil {
+			return errors.Wrap(err, "mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyID")
+		}
+		mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyID = reference.ToPtrValue(rsp.ResolvedValue)
+		mg.Spec.ForProvider.TaskParams[i3].AlertUrgencyIDRef = rsp.ResolvedReference
+
+	}
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: reference.FromPtrValue(mg.Spec.ForProvider.WorkflowID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.ForProvider.WorkflowIDRef,
+		Selector:     mg.Spec.ForProvider.WorkflowIDSelector,
+		To: reference.To{
+			List:    &WorkflowAlertList{},
+			Managed: &WorkflowAlert{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.WorkflowID")
+	}
+	mg.Spec.ForProvider.WorkflowID = reference.ToPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.WorkflowIDRef = rsp.ResolvedReference
+
+	for i3 := 0; i3 < len(mg.Spec.InitProvider.TaskParams); i3++ {
+		rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+			CurrentValue: reference.FromPtrValue(mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyID),
+			Extract:      reference.ExternalName(),
+			Namespace:    mg.GetNamespace(),
+			Reference:    mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyIDRef,
+			Selector:     mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyIDSelector,
+			To: reference.To{
+				List:    &v1alpha13.AlertUrgencyList{},
+				Managed: &v1alpha13.AlertUrgency{},
+			},
+		})
+		if err != nil {
+			return errors.Wrap(err, "mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyID")
+		}
+		mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyID = reference.ToPtrValue(rsp.ResolvedValue)
+		mg.Spec.InitProvider.TaskParams[i3].AlertUrgencyIDRef = rsp.ResolvedReference
+
+	}
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: reference.FromPtrValue(mg.Spec.InitProvider.WorkflowID),
+		Extract:      reference.ExternalName(),
+		Namespace:    mg.GetNamespace(),
+		Reference:    mg.Spec.InitProvider.WorkflowIDRef,
+		Selector:     mg.Spec.InitProvider.WorkflowIDSelector,
+		To: reference.To{
+			List:    &WorkflowAlertList{},
+			Managed: &WorkflowAlert{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.WorkflowID")
+	}
+	mg.Spec.InitProvider.WorkflowID = reference.ToPtrValue(rsp.ResolvedValue)
+	mg.Spec.InitProvider.WorkflowIDRef = rsp.ResolvedReference
+
+	return nil
+}
+
 // ResolveReferences of this WorkflowTaskPublishIncident.
 func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c client.Reader) error {
 	r := reference.NewAPIResolver(c, mg)
@@ -448,8 +531,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 			Reference:    mg.Spec.ForProvider.TaskParams[i3].StatusPageIDRef,
 			Selector:     mg.Spec.ForProvider.TaskParams[i3].StatusPageIDSelector,
 			To: reference.To{
-				List:    &v1alpha13.StatusPageList{},
-				Managed: &v1alpha13.StatusPage{},
+				List:    &v1alpha14.StatusPageList{},
+				Managed: &v1alpha14.StatusPage{},
 			},
 		})
 		if err != nil {
@@ -467,8 +550,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 			References:    mg.Spec.ForProvider.TaskParams[i3].StatusPageIdsRefs,
 			Selector:      mg.Spec.ForProvider.TaskParams[i3].StatusPageIdsSelector,
 			To: reference.To{
-				List:    &v1alpha13.StatusPageList{},
-				Managed: &v1alpha13.StatusPage{},
+				List:    &v1alpha14.StatusPageList{},
+				Managed: &v1alpha14.StatusPage{},
 			},
 		})
 		if err != nil {
@@ -503,8 +586,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 			Reference:    mg.Spec.InitProvider.TaskParams[i3].StatusPageIDRef,
 			Selector:     mg.Spec.InitProvider.TaskParams[i3].StatusPageIDSelector,
 			To: reference.To{
-				List:    &v1alpha13.StatusPageList{},
-				Managed: &v1alpha13.StatusPage{},
+				List:    &v1alpha14.StatusPageList{},
+				Managed: &v1alpha14.StatusPage{},
 			},
 		})
 		if err != nil {
@@ -522,8 +605,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 			References:    mg.Spec.InitProvider.TaskParams[i3].StatusPageIdsRefs,
 			Selector:      mg.Spec.InitProvider.TaskParams[i3].StatusPageIdsSelector,
 			To: reference.To{
-				List:    &v1alpha13.StatusPageList{},
-				Managed: &v1alpha13.StatusPage{},
+				List:    &v1alpha14.StatusPageList{},
+				Managed: &v1alpha14.StatusPage{},
 			},
 		})
 		if err != nil {

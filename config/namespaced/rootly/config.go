@@ -105,6 +105,10 @@ func configureAlerting(p *ujconfig.Provider) {
 			TerraformName: tfService,
 		}
 	})
+	p.AddResourceConfigurator(tfAlertUrgency, func(r *ujconfig.Resource) {
+		r.ShortGroup = "alerts"
+		r.Kind = "AlertUrgency"
+	})
 }
 
 // configureCatalog covers the service catalog and incident taxonomy.
@@ -143,8 +147,8 @@ func configureCatalog(p *ujconfig.Provider) {
 	})
 }
 
-// configureWorkflows covers the alert-triggered workflow and the two steps
-// that turn an alert into a published incident. Upstream has one workflow
+// configureWorkflows covers the alert-triggered workflow and the steps that
+// page responders and turn an alert into a published incident. Upstream has one workflow
 // resource per trigger genre; a task's workflowId names a WorkflowAlert here,
 // and a workflow of another genre, when one is generated, takes the raw id.
 func configureWorkflows(p *ujconfig.Provider) {
@@ -201,6 +205,20 @@ func configureWorkflows(p *ujconfig.Provider) {
 		r.References["task_params.status_page_ids"] = ujconfig.Reference{
 			TerraformName: tfStatusPage,
 		}
+	})
+	p.AddResourceConfigurator(tfWorkflowTaskPageRootlyOnCallResponders, func(r *ujconfig.Resource) {
+		r.ShortGroup = "workflow"
+		r.Kind = "WorkflowTaskPageRootlyOnCallResponders"
+		r.References["workflow_id"] = ujconfig.Reference{
+			TerraformName: tfWorkflowAlert,
+		}
+		r.References["task_params.alert_urgency_id"] = ujconfig.Reference{
+			TerraformName: tfAlertUrgency,
+		}
+		// Who is paged is one of five {id, name} maps -- serviceTarget,
+		// groupTarget, functionalityTarget, escalationPolicyTarget,
+		// userTarget. A reference resolves a scalar id, not a map value, so
+		// each target takes the Rootly id and name as written.
 	})
 }
 

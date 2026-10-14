@@ -1,0 +1,11 @@
+apiVersion: alerts.rootly.crossplane.io/v1alpha1
+kind: AlertUrgency
+metadata:
+  name: critical
+spec:
+  forProvider:
+    name: Critical
+    description: Pages the on-call responder immediately.
+    color: "#E8541E"
+  providerConfigRef:
+    name: default

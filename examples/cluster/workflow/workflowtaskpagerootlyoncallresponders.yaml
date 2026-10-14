@@ -1,0 +1,27 @@
+apiVersion: workflow.rootly.crossplane.io/v1alpha1
+kind: WorkflowTaskPageRootlyOnCallResponders
+metadata:
+  name: alert-to-incident-page
+spec:
+  forProvider:
+    name: Page service on-call
+    position: 3
+    enabled: true
+    skipOnFailure: false
+    workflowIdRef:
+      name: alert-to-incident
+    taskParams:
+      - alertUrgencyIdRef:
+          name: critical
+        summary: "{{ alert.summary }}"
+        description: "{{ alert.description }}"
+        escalationNote: "Incident {{ incident.sequential_id }} is open for this alert."
+        # Who is paged is a map of the target's Rootly id and name. The other
+        # targets are groupTarget, functionalityTarget, escalationPolicyTarget
+        # and userTarget; use one.
+        serviceTarget:
+          id: 00000000-0000-0000-0000-000000000000
+          name: Authorization server
+        createNewAlert: false
+  providerConfigRef:
+    name: default

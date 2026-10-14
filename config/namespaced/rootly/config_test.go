@@ -17,9 +17,10 @@ import (
 var generated = []string{
 	tfTeam, tfEscalationPolicy, tfEscalationLevel,
 	tfSchedule, tfScheduleRotation, tfScheduleRotationUser,
-	tfHeartbeat, tfAlertsSource, tfAlertRoute,
+	tfHeartbeat, tfAlertsSource, tfAlertRoute, tfAlertUrgency,
 	tfService, tfFunctionality, tfIncidentType, tfSeverity,
 	tfWorkflowAlert, tfWorkflowTaskCreateIncident, tfWorkflowTaskPublishIncident,
+	tfWorkflowTaskPageRootlyOnCallResponders,
 	tfStatusPage, tfStatusPageComponent, tfStatusPageComponentGroup,
 }
 
@@ -73,6 +74,7 @@ func TestConfigureNamesEveryKind(t *testing.T) {
 		{name: "Heartbeat", resource: tfHeartbeat, shortGroup: "heartbeat", kind: "Heartbeat"},
 		{name: "AlertsSource", resource: tfAlertsSource, shortGroup: "alerts", kind: "AlertsSource"},
 		{name: "AlertRoute", resource: tfAlertRoute, shortGroup: "alerts", kind: "AlertRoute"},
+		{name: "AlertUrgency", resource: tfAlertUrgency, shortGroup: "alerts", kind: "AlertUrgency"},
 		{name: "Service", resource: tfService, shortGroup: "service", kind: "Service"},
 		{name: "Functionality", resource: tfFunctionality, shortGroup: "service", kind: "Functionality"},
 		{name: "IncidentType", resource: tfIncidentType, shortGroup: "incident", kind: "IncidentType"},
@@ -80,6 +82,7 @@ func TestConfigureNamesEveryKind(t *testing.T) {
 		{name: "WorkflowAlert", resource: tfWorkflowAlert, shortGroup: "workflow", kind: "WorkflowAlert"},
 		{name: "WorkflowTaskCreateIncident", resource: tfWorkflowTaskCreateIncident, shortGroup: "workflow", kind: "WorkflowTaskCreateIncident"},
 		{name: "WorkflowTaskPublishIncident", resource: tfWorkflowTaskPublishIncident, shortGroup: "workflow", kind: "WorkflowTaskPublishIncident"},
+		{name: "WorkflowTaskPageRootlyOnCallResponders", resource: tfWorkflowTaskPageRootlyOnCallResponders, shortGroup: "workflow", kind: "WorkflowTaskPageRootlyOnCallResponders"},
 		{name: "StatusPage", resource: tfStatusPage, shortGroup: "statuspage", kind: "StatusPage"},
 		{name: "StatusPageComponent", resource: tfStatusPageComponent, shortGroup: "statuspage", kind: "StatusPageComponent"},
 		{name: "StatusPageComponentGroup", resource: tfStatusPageComponentGroup, shortGroup: "statuspage", kind: "StatusPageComponentGroup"},
@@ -145,6 +148,8 @@ func TestConfigureReferences(t *testing.T) {
 		{resource: tfWorkflowTaskPublishIncident, field: "workflow_id", target: tfWorkflowAlert},
 		{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_id", target: tfStatusPage},
 		{resource: tfWorkflowTaskPublishIncident, field: "task_params.status_page_ids", target: tfStatusPage},
+		{resource: tfWorkflowTaskPageRootlyOnCallResponders, field: "workflow_id", target: tfWorkflowAlert},
+		{resource: tfWorkflowTaskPageRootlyOnCallResponders, field: "task_params.alert_urgency_id", target: tfAlertUrgency},
 		{resource: tfStatusPage, field: "service_ids", target: tfService},
 		{resource: tfStatusPage, field: "functionality_ids", target: tfFunctionality},
 		{resource: tfStatusPageComponentGroup, field: "status_page_id", target: tfStatusPage},

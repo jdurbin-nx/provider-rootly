@@ -108,6 +108,56 @@ func (mg *WorkflowTaskCreateIncident) SetWriteConnectionSecretToReference(r *xpv
 	mg.Spec.WriteConnectionSecretToReference = r
 }
 
+// GetCondition of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) GetCondition(ct xpv2.ConditionType) xpv2.Condition {
+	return mg.Status.GetCondition(ct)
+}
+
+// GetDeletionPolicy of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) GetDeletionPolicy() xpv2.DeletionPolicy {
+	return mg.Spec.DeletionPolicy
+}
+
+// GetManagementPolicies of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) GetManagementPolicies() xpv2.ManagementPolicies {
+	return mg.Spec.ManagementPolicies
+}
+
+// GetProviderConfigReference of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) GetProviderConfigReference() *xpv2.Reference {
+	return mg.Spec.ProviderConfigReference
+}
+
+// GetWriteConnectionSecretToReference of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) GetWriteConnectionSecretToReference() *xpv2.SecretReference {
+	return mg.Spec.WriteConnectionSecretToReference
+}
+
+// SetConditions of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) SetConditions(c ...xpv2.Condition) {
+	mg.Status.SetConditions(c...)
+}
+
+// SetDeletionPolicy of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) SetDeletionPolicy(r xpv2.DeletionPolicy) {
+	mg.Spec.DeletionPolicy = r
+}
+
+// SetManagementPolicies of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) SetManagementPolicies(r xpv2.ManagementPolicies) {
+	mg.Spec.ManagementPolicies = r
+}
+
+// SetProviderConfigReference of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) SetProviderConfigReference(r *xpv2.Reference) {
+	mg.Spec.ProviderConfigReference = r
+}
+
+// SetWriteConnectionSecretToReference of this WorkflowTaskPageRootlyOnCallResponders.
+func (mg *WorkflowTaskPageRootlyOnCallResponders) SetWriteConnectionSecretToReference(r *xpv2.SecretReference) {
+	mg.Spec.WriteConnectionSecretToReference = r
+}
+
 // GetCondition of this WorkflowTaskPublishIncident.
 func (mg *WorkflowTaskPublishIncident) GetCondition(ct xpv2.ConditionType) xpv2.Condition {
 	return mg.Status.GetCondition(ct)
