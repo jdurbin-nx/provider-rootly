@@ -5,7 +5,7 @@ metadata:
 spec:
   forProvider:
     name: Page service on-call
-    position: 3
+    position: 2
     enabled: true
     skipOnFailure: false
     workflowIdRef:

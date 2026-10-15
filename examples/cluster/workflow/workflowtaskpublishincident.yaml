@@ -1,15 +1,17 @@
 apiVersion: workflow.rootly.crossplane.io/v1alpha1
 kind: WorkflowTaskPublishIncident
 metadata:
-  name: alert-to-incident-publish
+  name: incident-to-status-page-publish
 spec:
   forProvider:
     name: Publish to status page
-    position: 2
+    position: 1
     enabled: true
     skipOnFailure: false
+    # Publishing acts on the incident, so this is a step of the
+    # incident-triggered workflow, not the alert one.
     workflowIdRef:
-      name: alert-to-incident
+      name: incident-to-status-page
     taskParams:
       - statusPageIdRef:
           name: public

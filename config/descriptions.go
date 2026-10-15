@@ -30,6 +30,7 @@ var KindDescriptions = map[string]string{
 	tfIncidentType:                           "An incident type: a category an incident is filed under, such as Security or Outage.",
 	tfSeverity:                               "A severity level for incidents, such as SEV0 or SEV1.",
 	tfWorkflowAlert:                          "A workflow triggered by alert events. Its steps are the WorkflowTask kinds that reference it.",
+	tfWorkflowIncident:                       "A workflow triggered by incident events, where the incident is in scope for its steps. Its steps are the WorkflowTask kinds that reference it.",
 	tfWorkflowTaskCreateIncident:             "A workflow step that creates an incident, optionally attached to services, with a severity and type.",
 	tfWorkflowTaskPublishIncident:            "A workflow step that publishes an incident update to a status page.",
 	tfWorkflowTaskPageRootlyOnCallResponders: "A workflow step that pages the on-call responders of a service, team, functionality, escalation policy or user through Rootly On-Call, at a given alert urgency.",

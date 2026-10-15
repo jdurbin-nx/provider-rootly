@@ -1,0 +1,1769 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: workflowincidents.workflow.rootly.crossplane.io
+spec:
+  group: workflow.rootly.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - rootly
+    kind: WorkflowIncident
+    listKind: WorkflowIncidentList
+    plural: workflowincidents
+    singular: workflowincident
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: WorkflowIncident is the Schema for the WorkflowIncidents API.
+          A workflow triggered by incident events, where the incident is in scope
+          for its steps. Its steps are the WorkflowTask kinds that reference it.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: WorkflowIncidentSpec defines the desired state of WorkflowIncident
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: |-
+                  DeletionPolicy specifies what will happen to the underlying external
+                  when this managed resource is deleted - either "Delete" or "Orphan" the
+                  external resource.
+                  This field is planned to be deprecated in favor of the ManagementPolicies
+                  field in a future release. Currently, both could be set independently and
+                  non-default values would be honored if the feature flag is enabled.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                properties:
+                  causeIds:
+                    items:
+                      type: string
+                    type: array
+                  command:
+                    description: Workflow command
+                    type: string
+                  commandFeedbackEnabled:
+                    description: This will notify you back when the workflow is starting.
+                      Value must be one of true or false
+                    type: boolean
+                  continuouslyRepeat:
+                    description: When continuously repeat is true, repeat workflows
+                      aren't automatically stopped when conditions aren't met. This
+                      setting won't override your conditions set by repeat_condition_duration_since_first_run
+                      and repeat_condition_number_of_repeats parameters.. Value must
+                      be one of true or false
+                    type: boolean
+                  description:
+                    description: The description of the workflow
+                    type: string
+                  enabled:
+                    type: boolean
+                  environmentIds:
+                    items:
+                      type: string
+                    type: array
+                  functionalityIds:
+                    items:
+                      type: string
+                    type: array
+                  functionalityIdsRefs:
+                    description: References to Functionality in service to populate
+                      functionalityIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  functionalityIdsSelector:
+                    description: Selector for a list of Functionality in service to
+                      populate functionalityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  groupIds:
+                    items:
+                      type: string
+                    type: array
+                  groupIdsRefs:
+                    description: References to Team in team to populate groupIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  groupIdsSelector:
+                    description: Selector for a list of Team in team to populate groupIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  incidentRoleIds:
+                    items:
+                      type: string
+                    type: array
+                  incidentTypeIds:
+                    items:
+                      type: string
+                    type: array
+                  incidentTypeIdsRefs:
+                    description: References to IncidentType in incident to populate
+                      incidentTypeIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  incidentTypeIdsSelector:
+                    description: Selector for a list of IncidentType in incident to
+                      populate incidentTypeIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  locked:
+                    description: Restricts workflow edits to admins when turned on.
+                      Only admins can set this field.. Value must be one of true or
+                      false
+                    type: boolean
+                  name:
+                    description: The title of the workflow
+                    type: string
+                  position:
+                    description: The order which the workflow should run with other
+                      workflows.
+                    type: number
+                  repeatConditionDurationSinceFirstRun:
+                    description: The workflow will stop repeating if its runtime since
+                      it's first workflow run exceeds the duration set in this field
+                    type: string
+                  repeatConditionNumberOfRepeats:
+                    description: The workflow will stop repeating if the number of
+                      repeats exceeds the value set in this field
+                    type: number
+                  repeatEveryDuration:
+                    description: Repeat workflow every duration
+                    type: string
+                  repeatOn:
+                    description: Repeat on weekdays. Value must be one of `S`, `M`,
+                      `T`, `W`, `R`, `F`, `U`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  severityIds:
+                    items:
+                      type: string
+                    type: array
+                  severityIdsRefs:
+                    description: References to Severity in incident to populate severityIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  severityIdsSelector:
+                    description: Selector for a list of Severity in incident to populate
+                      severityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  slug:
+                    description: The slug of the workflow
+                    type: string
+                  subStatusIds:
+                    items:
+                      type: string
+                    type: array
+                  triggerParams:
+                    items:
+                      properties:
+                        incidentCondition:
+                          description: Value must be one of `ALL`, `ANY`, `NONE`.
+                          type: string
+                        incidentConditionAcknowledgedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionCause:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionDetectedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionEnvironment:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionFunctionality:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionGroup:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentRoles:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentType:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionKind:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabel:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabelUseRegexp:
+                          description: Value must be one of true or false
+                          type: boolean
+                        incidentConditionMitigatedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionResolvedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionService:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSeverity:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionStartedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSubStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSummary:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionVisibility:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionalInactivity:
+                          description: Value must be one of `IS`.
+                          type: string
+                        incidentInactivityDuration:
+                          description: ex. 10 min, 1h, 3 days, 2 weeks
+                          type: string
+                        incidentKinds:
+                          description: Value must be one of `test`, `test_sub`, `example`,
+                            `example_sub`, `normal`, `normal_sub`, `backfilled`, `scheduled`,
+                            `scheduled_sub`.
+                          items:
+                            type: string
+                          type: array
+                        incidentLabels:
+                          items:
+                            type: string
+                          type: array
+                        incidentPostMortemConditionCause:
+                          description: '[DEPRECATED] Use incident_condition_cause
+                            instead. Value must be one of `IS`, `IS NOT`, `ANY`, `CONTAINS`,
+                            `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`, `UNSET`.'
+                          type: string
+                        incidentStatuses:
+                          description: Value must be one of `in_triage`, `started`,
+                            `detected`, `acknowledged`, `mitigated`, `resolved`, `closed`,
+                            `cancelled`, `scheduled`, `in_progress`, `completed`.
+                          items:
+                            type: string
+                          type: array
+                        incidentVisibilities:
+                          items:
+                            type: string
+                          type: array
+                        triggerType:
+                          description: Value must be one of `incident`.
+                          type: string
+                        triggers:
+                          description: Actions that trigger the workflow. One of custom_fields.<slug>.updated,
+                            incident_in_triage, incident_created, incident_started,
+                            incident_updated, title_updated, summary_updated, status_updated,
+                            severity_updated, environments_added, environments_removed,
+                            environments_updated, incident_types_added, incident_types_removed,
+                            incident_types_updated, services_added, services_removed,
+                            services_updated, visibility_updated, functionalities_added,
+                            functionalities_removed, functionalities_updated, teams_added,
+                            teams_removed, teams_updated, causes_added, causes_removed,
+                            causes_updated, timeline_updated, status_page_timeline_updated,
+                            role_assignments_updated, role_assignments_added, role_assignments_removed,
+                            slack_command, slack_channel_created, slack_channel_converted,
+                            microsoft_teams_channel_created, microsoft_teams_chat_created,
+                            google_chat_space_created, subscribers_updated, subscribers_added,
+                            subscribers_removed, user_joined_slack_channel, user_left_slack_channel,
+                            meeting_summary_created
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                  wait:
+                    description: Wait this duration before executing
+                    type: string
+                  workflowGroupId:
+                    description: The group this workflow belongs to.
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  causeIds:
+                    items:
+                      type: string
+                    type: array
+                  command:
+                    description: Workflow command
+                    type: string
+                  commandFeedbackEnabled:
+                    description: This will notify you back when the workflow is starting.
+                      Value must be one of true or false
+                    type: boolean
+                  continuouslyRepeat:
+                    description: When continuously repeat is true, repeat workflows
+                      aren't automatically stopped when conditions aren't met. This
+                      setting won't override your conditions set by repeat_condition_duration_since_first_run
+                      and repeat_condition_number_of_repeats parameters.. Value must
+                      be one of true or false
+                    type: boolean
+                  description:
+                    description: The description of the workflow
+                    type: string
+                  enabled:
+                    type: boolean
+                  environmentIds:
+                    items:
+                      type: string
+                    type: array
+                  functionalityIds:
+                    items:
+                      type: string
+                    type: array
+                  functionalityIdsRefs:
+                    description: References to Functionality in service to populate
+                      functionalityIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  functionalityIdsSelector:
+                    description: Selector for a list of Functionality in service to
+                      populate functionalityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  groupIds:
+                    items:
+                      type: string
+                    type: array
+                  groupIdsRefs:
+                    description: References to Team in team to populate groupIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  groupIdsSelector:
+                    description: Selector for a list of Team in team to populate groupIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  incidentRoleIds:
+                    items:
+                      type: string
+                    type: array
+                  incidentTypeIds:
+                    items:
+                      type: string
+                    type: array
+                  incidentTypeIdsRefs:
+                    description: References to IncidentType in incident to populate
+                      incidentTypeIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  incidentTypeIdsSelector:
+                    description: Selector for a list of IncidentType in incident to
+                      populate incidentTypeIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  locked:
+                    description: Restricts workflow edits to admins when turned on.
+                      Only admins can set this field.. Value must be one of true or
+                      false
+                    type: boolean
+                  name:
+                    description: The title of the workflow
+                    type: string
+                  position:
+                    description: The order which the workflow should run with other
+                      workflows.
+                    type: number
+                  repeatConditionDurationSinceFirstRun:
+                    description: The workflow will stop repeating if its runtime since
+                      it's first workflow run exceeds the duration set in this field
+                    type: string
+                  repeatConditionNumberOfRepeats:
+                    description: The workflow will stop repeating if the number of
+                      repeats exceeds the value set in this field
+                    type: number
+                  repeatEveryDuration:
+                    description: Repeat workflow every duration
+                    type: string
+                  repeatOn:
+                    description: Repeat on weekdays. Value must be one of `S`, `M`,
+                      `T`, `W`, `R`, `F`, `U`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    items:
+                      type: string
+                    type: array
+                  serviceIdsRefs:
+                    description: References to Service in service to populate serviceIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  serviceIdsSelector:
+                    description: Selector for a list of Service in service to populate
+                      serviceIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  severityIds:
+                    items:
+                      type: string
+                    type: array
+                  severityIdsRefs:
+                    description: References to Severity in incident to populate severityIds.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  severityIdsSelector:
+                    description: Selector for a list of Severity in incident to populate
+                      severityIds.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  slug:
+                    description: The slug of the workflow
+                    type: string
+                  subStatusIds:
+                    items:
+                      type: string
+                    type: array
+                  triggerParams:
+                    items:
+                      properties:
+                        incidentCondition:
+                          description: Value must be one of `ALL`, `ANY`, `NONE`.
+                          type: string
+                        incidentConditionAcknowledgedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionCause:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionDetectedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionEnvironment:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionFunctionality:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionGroup:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentRoles:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentType:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionKind:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabel:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabelUseRegexp:
+                          description: Value must be one of true or false
+                          type: boolean
+                        incidentConditionMitigatedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionResolvedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionService:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSeverity:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionStartedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSubStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSummary:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionVisibility:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionalInactivity:
+                          description: Value must be one of `IS`.
+                          type: string
+                        incidentInactivityDuration:
+                          description: ex. 10 min, 1h, 3 days, 2 weeks
+                          type: string
+                        incidentKinds:
+                          description: Value must be one of `test`, `test_sub`, `example`,
+                            `example_sub`, `normal`, `normal_sub`, `backfilled`, `scheduled`,
+                            `scheduled_sub`.
+                          items:
+                            type: string
+                          type: array
+                        incidentLabels:
+                          items:
+                            type: string
+                          type: array
+                        incidentPostMortemConditionCause:
+                          description: '[DEPRECATED] Use incident_condition_cause
+                            instead. Value must be one of `IS`, `IS NOT`, `ANY`, `CONTAINS`,
+                            `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`, `UNSET`.'
+                          type: string
+                        incidentStatuses:
+                          description: Value must be one of `in_triage`, `started`,
+                            `detected`, `acknowledged`, `mitigated`, `resolved`, `closed`,
+                            `cancelled`, `scheduled`, `in_progress`, `completed`.
+                          items:
+                            type: string
+                          type: array
+                        incidentVisibilities:
+                          items:
+                            type: string
+                          type: array
+                        triggerType:
+                          description: Value must be one of `incident`.
+                          type: string
+                        triggers:
+                          description: Actions that trigger the workflow. One of custom_fields.<slug>.updated,
+                            incident_in_triage, incident_created, incident_started,
+                            incident_updated, title_updated, summary_updated, status_updated,
+                            severity_updated, environments_added, environments_removed,
+                            environments_updated, incident_types_added, incident_types_removed,
+                            incident_types_updated, services_added, services_removed,
+                            services_updated, visibility_updated, functionalities_added,
+                            functionalities_removed, functionalities_updated, teams_added,
+                            teams_removed, teams_updated, causes_added, causes_removed,
+                            causes_updated, timeline_updated, status_page_timeline_updated,
+                            role_assignments_updated, role_assignments_added, role_assignments_removed,
+                            slack_command, slack_channel_created, slack_channel_converted,
+                            microsoft_teams_channel_created, microsoft_teams_chat_created,
+                            google_chat_space_created, subscribers_updated, subscribers_added,
+                            subscribers_removed, user_joined_slack_channel, user_left_slack_channel,
+                            meeting_summary_created
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                  wait:
+                    description: Wait this duration before executing
+                    type: string
+                  workflowGroupId:
+                    description: The group this workflow belongs to.
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  This field is planned to replace the DeletionPolicy field in a future
+                  release. Currently, both could be set independently and non-default
+                  values would be honored if the feature flag is enabled. If both are
+                  custom, the DeletionPolicy field will be ignored.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.name is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
+                || (has(self.initProvider) && has(self.initProvider.name))'
+          status:
+            description: WorkflowIncidentStatus defines the observed state of WorkflowIncident.
+            properties:
+              atProvider:
+                properties:
+                  causeIds:
+                    items:
+                      type: string
+                    type: array
+                  command:
+                    description: Workflow command
+                    type: string
+                  commandFeedbackEnabled:
+                    description: This will notify you back when the workflow is starting.
+                      Value must be one of true or false
+                    type: boolean
+                  continuouslyRepeat:
+                    description: When continuously repeat is true, repeat workflows
+                      aren't automatically stopped when conditions aren't met. This
+                      setting won't override your conditions set by repeat_condition_duration_since_first_run
+                      and repeat_condition_number_of_repeats parameters.. Value must
+                      be one of true or false
+                    type: boolean
+                  description:
+                    description: The description of the workflow
+                    type: string
+                  enabled:
+                    type: boolean
+                  environmentIds:
+                    items:
+                      type: string
+                    type: array
+                  functionalityIds:
+                    items:
+                      type: string
+                    type: array
+                  groupIds:
+                    items:
+                      type: string
+                    type: array
+                  id:
+                    type: string
+                  incidentRoleIds:
+                    items:
+                      type: string
+                    type: array
+                  incidentTypeIds:
+                    items:
+                      type: string
+                    type: array
+                  locked:
+                    description: Restricts workflow edits to admins when turned on.
+                      Only admins can set this field.. Value must be one of true or
+                      false
+                    type: boolean
+                  name:
+                    description: The title of the workflow
+                    type: string
+                  position:
+                    description: The order which the workflow should run with other
+                      workflows.
+                    type: number
+                  repeatConditionDurationSinceFirstRun:
+                    description: The workflow will stop repeating if its runtime since
+                      it's first workflow run exceeds the duration set in this field
+                    type: string
+                  repeatConditionNumberOfRepeats:
+                    description: The workflow will stop repeating if the number of
+                      repeats exceeds the value set in this field
+                    type: number
+                  repeatEveryDuration:
+                    description: Repeat workflow every duration
+                    type: string
+                  repeatOn:
+                    description: Repeat on weekdays. Value must be one of `S`, `M`,
+                      `T`, `W`, `R`, `F`, `U`.
+                    items:
+                      type: string
+                    type: array
+                  serviceIds:
+                    items:
+                      type: string
+                    type: array
+                  severityIds:
+                    items:
+                      type: string
+                    type: array
+                  slug:
+                    description: The slug of the workflow
+                    type: string
+                  subStatusIds:
+                    items:
+                      type: string
+                    type: array
+                  triggerParams:
+                    items:
+                      properties:
+                        incidentCondition:
+                          description: Value must be one of `ALL`, `ANY`, `NONE`.
+                          type: string
+                        incidentConditionAcknowledgedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionCause:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionDetectedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionEnvironment:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionFunctionality:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionGroup:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentRoles:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionIncidentType:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionKind:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabel:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionLabelUseRegexp:
+                          description: Value must be one of true or false
+                          type: boolean
+                        incidentConditionMitigatedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionResolvedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionService:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSeverity:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionStartedAt:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSubStatus:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionSummary:
+                          description: Value must be one of `SET`, `UNSET`.
+                          type: string
+                        incidentConditionVisibility:
+                          description: Value must be one of `IS`, `IS NOT`, `ANY`,
+                            `CONTAINS`, `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`,
+                            `UNSET`.
+                          type: string
+                        incidentConditionalInactivity:
+                          description: Value must be one of `IS`.
+                          type: string
+                        incidentInactivityDuration:
+                          description: ex. 10 min, 1h, 3 days, 2 weeks
+                          type: string
+                        incidentKinds:
+                          description: Value must be one of `test`, `test_sub`, `example`,
+                            `example_sub`, `normal`, `normal_sub`, `backfilled`, `scheduled`,
+                            `scheduled_sub`.
+                          items:
+                            type: string
+                          type: array
+                        incidentLabels:
+                          items:
+                            type: string
+                          type: array
+                        incidentPostMortemConditionCause:
+                          description: '[DEPRECATED] Use incident_condition_cause
+                            instead. Value must be one of `IS`, `IS NOT`, `ANY`, `CONTAINS`,
+                            `CONTAINS_ALL`, `CONTAINS_NONE`, `NONE`, `SET`, `UNSET`.'
+                          type: string
+                        incidentStatuses:
+                          description: Value must be one of `in_triage`, `started`,
+                            `detected`, `acknowledged`, `mitigated`, `resolved`, `closed`,
+                            `cancelled`, `scheduled`, `in_progress`, `completed`.
+                          items:
+                            type: string
+                          type: array
+                        incidentVisibilities:
+                          items:
+                            type: string
+                          type: array
+                        triggerType:
+                          description: Value must be one of `incident`.
+                          type: string
+                        triggers:
+                          description: Actions that trigger the workflow. One of custom_fields.<slug>.updated,
+                            incident_in_triage, incident_created, incident_started,
+                            incident_updated, title_updated, summary_updated, status_updated,
+                            severity_updated, environments_added, environments_removed,
+                            environments_updated, incident_types_added, incident_types_removed,
+                            incident_types_updated, services_added, services_removed,
+                            services_updated, visibility_updated, functionalities_added,
+                            functionalities_removed, functionalities_updated, teams_added,
+                            teams_removed, teams_updated, causes_added, causes_removed,
+                            causes_updated, timeline_updated, status_page_timeline_updated,
+                            role_assignments_updated, role_assignments_added, role_assignments_removed,
+                            slack_command, slack_channel_created, slack_channel_converted,
+                            microsoft_teams_channel_created, microsoft_teams_chat_created,
+                            google_chat_space_created, subscribers_updated, subscribers_added,
+                            subscribers_removed, user_joined_slack_channel, user_left_slack_channel,
+                            meeting_summary_created
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                  wait:
+                    description: Wait this duration before executing
+                    type: string
+                  workflowGroupId:
+                    description: The group this workflow belongs to.
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile-requested-at annotation token that the controller has
+                  processed. Users can compare this to the annotation to determine
+                  whether a reconcile request has been handled.
+                type: string
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

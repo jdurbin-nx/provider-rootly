@@ -28,6 +28,7 @@ The on-call set, and the kinds that take an alert through to a status page:
 | `IncidentType` | `incident.rootly.crossplane.io` | `rootly_incident_type` |
 | `Severity` | `incident.rootly.crossplane.io` | `rootly_severity` |
 | `WorkflowAlert` | `workflow.rootly.crossplane.io` | `rootly_workflow_alert` |
+| `WorkflowIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_incident` |
 | `WorkflowTaskCreateIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_create_incident` |
 | `WorkflowTaskPublishIncident` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_publish_incident` |
 | `WorkflowTaskPageRootlyOnCallResponders` | `workflow.rootly.crossplane.io` | `rootly_workflow_task_page_rootly_on_call_responders` |
@@ -68,16 +69,20 @@ The kinds compose into one flow, every link by name:
    `targetIdRef`.
 3. A `WorkflowAlert` fires on `alert_created`. Its steps are separate kinds that
    name it in `workflowIdRef`: a `WorkflowTaskCreateIncident` opens the
-   incident against the `Service`, with a `Severity` and `IncidentType`, a
-   `WorkflowTaskPublishIncident` posts to the `StatusPage`, and a
-   `WorkflowTaskPageRootlyOnCallResponders` pages the on-call responders of
+   incident against the `Service`, with a `Severity` and `IncidentType`, and
+   a `WorkflowTaskPageRootlyOnCallResponders` pages the on-call responders of
    a target at an `AlertUrgency`.
-4. A `StatusPageComponent` mirrors the `Service` on the page, so what the
+4. A `WorkflowIncident` fires on `incident_created` for that `Service`. Its
+   `WorkflowTaskPublishIncident` posts the incident to the `StatusPage`.
+   Publishing acts on the incident, and only an incident-triggered workflow
+   runs its steps with the incident in scope: in an alert workflow the same
+   step runs and posts nothing, even after a create-incident step.
+5. A `StatusPageComponent` mirrors the `Service` on the page, so what the
    incident touches is what the page shows.
 
 `examples/cluster/` holds one manifest per kind, written as that flow.
 
-Three fields point at a kind chosen by a sibling type field, and a reference
+Four fields point at a kind chosen by a sibling type field, and a reference
 can only resolve one kind. Each resolves the kind the flow above needs; the
 others take the Rootly id directly:
 
@@ -85,7 +90,8 @@ others take the Rootly id directly:
 |---|---|---|---|
 | `AlertRoute` `rules[].destinations[].targetId` | `targetType` | `Service` | `Group`, `Functionality`, `EscalationPolicy` |
 | `StatusPageComponent` `sourceId` | `sourceType` | `Service` | `Functionality` |
-| `WorkflowTask*` `workflowId` | the workflow's genre | `WorkflowAlert` | workflows of other genres |
+| `WorkflowTaskCreateIncident`, `WorkflowTaskPageRootlyOnCallResponders` `workflowId` | the workflow's genre | `WorkflowAlert` | `WorkflowIncident` |
+| `WorkflowTaskPublishIncident` `workflowId` | the workflow's genre | `WorkflowIncident` | `WorkflowAlert` |
 
 A `WorkflowTaskPageRootlyOnCallResponders` names who it pages in one of five
 maps, `serviceTarget`, `groupTarget`, `functionalityTarget`,

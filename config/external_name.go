@@ -30,6 +30,7 @@ var ExternalNameConfigs = map[string]config.ExternalName{
 	tfIncidentType:                           config.IdentifierFromProvider,
 	tfSeverity:                               config.IdentifierFromProvider,
 	tfWorkflowAlert:                          config.IdentifierFromProvider,
+	tfWorkflowIncident:                       config.IdentifierFromProvider,
 	tfWorkflowTaskCreateIncident:             config.IdentifierFromProvider,
 	tfWorkflowTaskPublishIncident:            config.IdentifierFromProvider,
 	tfWorkflowTaskPageRootlyOnCallResponders: config.IdentifierFromProvider,

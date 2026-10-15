@@ -21,10 +21,24 @@ const (
 	tfIncidentType                           = "rootly_incident_type"
 	tfSeverity                               = "rootly_severity"
 	tfWorkflowAlert                          = "rootly_workflow_alert"
+	tfWorkflowIncident                       = "rootly_workflow_incident"
 	tfWorkflowTaskCreateIncident             = "rootly_workflow_task_create_incident"
 	tfWorkflowTaskPublishIncident            = "rootly_workflow_task_publish_incident"
 	tfWorkflowTaskPageRootlyOnCallResponders = "rootly_workflow_task_page_rootly_on_call_responders"
 	tfStatusPage                             = "rootly_status_page"
 	tfStatusPageComponent                    = "rootly_status_page_component"
 	tfStatusPageComponentGroup               = "rootly_status_page_component_group"
+)
+
+// API groups the kinds are generated into, by resource family.
+const (
+	groupTeam       = "team"
+	groupEscalation = "escalation"
+	groupSchedule   = "schedule"
+	groupHeartbeat  = "heartbeat"
+	groupAlerts     = "alerts"
+	groupService    = "service"
+	groupIncident   = "incident"
+	groupWorkflow   = "workflow"
+	groupStatusPage = "statuspage"
 )

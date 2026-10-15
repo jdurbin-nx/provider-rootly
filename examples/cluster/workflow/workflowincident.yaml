@@ -1,0 +1,18 @@
+apiVersion: workflow.rootly.crossplane.io/v1alpha1
+kind: WorkflowIncident
+metadata:
+  name: incident-to-status-page
+spec:
+  forProvider:
+    name: Incident to status page
+    description: Publishes every incident on the authorization server to the status page.
+    enabled: true
+    # The incident's services, matched by name.
+    serviceIdsRefs:
+      - name: authorization-server
+    triggerParams:
+      - triggers:
+          - incident_created
+        incidentConditionService: IS
+  providerConfigRef:
+    name: default

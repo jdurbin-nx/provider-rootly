@@ -10,6 +10,9 @@ package v1alpha1
 func (tr *WorkflowAlert) Hub() {}
 
 // Hub marks this type as a conversion hub.
+func (tr *WorkflowIncident) Hub() {}
+
+// Hub marks this type as a conversion hub.
 func (tr *WorkflowTaskCreateIncident) Hub() {}
 
 // Hub marks this type as a conversion hub.

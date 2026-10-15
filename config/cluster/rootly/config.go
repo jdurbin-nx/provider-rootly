@@ -28,15 +28,15 @@ func Configure(p *ujconfig.Provider) {
 // configureOnCall covers teams, escalation and schedules.
 func configureOnCall(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfTeam, func(r *ujconfig.Resource) {
-		r.ShortGroup = "team"
+		r.ShortGroup = groupTeam
 		r.Kind = "Team"
 	})
 	p.AddResourceConfigurator(tfEscalationPolicy, func(r *ujconfig.Resource) {
-		r.ShortGroup = "escalation"
+		r.ShortGroup = groupEscalation
 		r.Kind = "EscalationPolicy"
 	})
 	p.AddResourceConfigurator(tfEscalationLevel, func(r *ujconfig.Resource) {
-		r.ShortGroup = "escalation"
+		r.ShortGroup = groupEscalation
 		r.Kind = "EscalationLevel"
 		// A level is meaningless outside its policy, and the id is a Rootly
 		// UUID nobody should be copy-pasting: reference the policy by name.
@@ -45,11 +45,11 @@ func configureOnCall(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfSchedule, func(r *ujconfig.Resource) {
-		r.ShortGroup = "schedule"
+		r.ShortGroup = groupSchedule
 		r.Kind = "Schedule"
 	})
 	p.AddResourceConfigurator(tfScheduleRotation, func(r *ujconfig.Resource) {
-		r.ShortGroup = "schedule"
+		r.ShortGroup = groupSchedule
 		r.Kind = "ScheduleRotation"
 		// A rotation belongs to exactly one schedule: reference it by name.
 		r.References["schedule_id"] = ujconfig.Reference{
@@ -57,7 +57,7 @@ func configureOnCall(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfScheduleRotationUser, func(r *ujconfig.Resource) {
-		r.ShortGroup = "schedule"
+		r.ShortGroup = groupSchedule
 		r.Kind = "ScheduleRotationUser"
 		// One user's place in one rotation. Upstream deprecates this resource
 		// in favour of the rotation's inline scheduleRotationMembers, which
@@ -69,7 +69,7 @@ func configureOnCall(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfHeartbeat, func(r *ujconfig.Resource) {
-		r.ShortGroup = "heartbeat"
+		r.ShortGroup = groupHeartbeat
 		r.Kind = "Heartbeat"
 	})
 }
@@ -77,7 +77,7 @@ func configureOnCall(p *ujconfig.Provider) {
 // configureAlerting covers where alerts come from and where they go.
 func configureAlerting(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfAlertsSource, func(r *ujconfig.Resource) {
-		r.ShortGroup = "alerts"
+		r.ShortGroup = groupAlerts
 		r.Kind = "AlertsSource"
 		// alert_template_attributes and alert_source_fields_attributes conflict
 		// upstream, and the upstream Read always stores the template block,
@@ -89,7 +89,7 @@ func configureAlerting(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfAlertRoute, func(r *ujconfig.Resource) {
-		r.ShortGroup = "alerts"
+		r.ShortGroup = groupAlerts
 		r.Kind = "AlertRoute"
 		r.References["alerts_source_ids"] = ujconfig.Reference{
 			TerraformName: tfAlertsSource,
@@ -106,7 +106,7 @@ func configureAlerting(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfAlertUrgency, func(r *ujconfig.Resource) {
-		r.ShortGroup = "alerts"
+		r.ShortGroup = groupAlerts
 		r.Kind = "AlertUrgency"
 	})
 }
@@ -114,7 +114,7 @@ func configureAlerting(p *ujconfig.Provider) {
 // configureCatalog covers the service catalog and incident taxonomy.
 func configureCatalog(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfService, func(r *ujconfig.Resource) {
-		r.ShortGroup = "service"
+		r.ShortGroup = groupService
 		r.Kind = "Service"
 		r.References["escalation_policy_id"] = ujconfig.Reference{
 			TerraformName: tfEscalationPolicy,
@@ -125,7 +125,7 @@ func configureCatalog(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfFunctionality, func(r *ujconfig.Resource) {
-		r.ShortGroup = "service"
+		r.ShortGroup = groupService
 		r.Kind = "Functionality"
 		r.References["escalation_policy_id"] = ujconfig.Reference{
 			TerraformName: tfEscalationPolicy,
@@ -138,22 +138,25 @@ func configureCatalog(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfIncidentType, func(r *ujconfig.Resource) {
-		r.ShortGroup = "incident"
+		r.ShortGroup = groupIncident
 		r.Kind = "IncidentType"
 	})
 	p.AddResourceConfigurator(tfSeverity, func(r *ujconfig.Resource) {
-		r.ShortGroup = "incident"
+		r.ShortGroup = groupIncident
 		r.Kind = "Severity"
 	})
 }
 
-// configureWorkflows covers the alert-triggered workflow and the steps that
-// page responders and turn an alert into a published incident. Upstream has one workflow
-// resource per trigger genre; a task's workflowId names a WorkflowAlert here,
-// and a workflow of another genre, when one is generated, takes the raw id.
+// configureWorkflows covers the alert- and incident-triggered workflows and
+// the steps that page responders and turn an alert into a published incident.
+// Upstream has one workflow resource per trigger genre, and a task is a step
+// of exactly one workflow. Only the incident genre runs its steps with the
+// incident in scope, so a task that acts on the incident, such as publishing
+// it, belongs to a WorkflowIncident. A task's workflowId reference resolves
+// the genre its example uses; the other genre takes the raw id.
 func configureWorkflows(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfWorkflowAlert, func(r *ujconfig.Resource) {
-		r.ShortGroup = "workflow"
+		r.ShortGroup = groupWorkflow
 		r.Kind = "WorkflowAlert"
 		r.References["group_ids"] = ujconfig.Reference{
 			TerraformName: tfTeam,
@@ -171,8 +174,27 @@ func configureWorkflows(p *ujconfig.Provider) {
 			TerraformName: tfSeverity,
 		}
 	})
+	p.AddResourceConfigurator(tfWorkflowIncident, func(r *ujconfig.Resource) {
+		r.ShortGroup = groupWorkflow
+		r.Kind = "WorkflowIncident"
+		r.References["group_ids"] = ujconfig.Reference{
+			TerraformName: tfTeam,
+		}
+		r.References["service_ids"] = ujconfig.Reference{
+			TerraformName: tfService,
+		}
+		r.References["functionality_ids"] = ujconfig.Reference{
+			TerraformName: tfFunctionality,
+		}
+		r.References["incident_type_ids"] = ujconfig.Reference{
+			TerraformName: tfIncidentType,
+		}
+		r.References["severity_ids"] = ujconfig.Reference{
+			TerraformName: tfSeverity,
+		}
+	})
 	p.AddResourceConfigurator(tfWorkflowTaskCreateIncident, func(r *ujconfig.Resource) {
-		r.ShortGroup = "workflow"
+		r.ShortGroup = groupWorkflow
 		r.Kind = "WorkflowTaskCreateIncident"
 		r.References["workflow_id"] = ujconfig.Reference{
 			TerraformName: tfWorkflowAlert,
@@ -194,10 +216,13 @@ func configureWorkflows(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfWorkflowTaskPublishIncident, func(r *ujconfig.Resource) {
-		r.ShortGroup = "workflow"
+		r.ShortGroup = groupWorkflow
 		r.Kind = "WorkflowTaskPublishIncident"
+		// Publishing acts on the incident, which only an incident-triggered
+		// workflow has in scope; in an alert workflow this step runs and
+		// posts nothing.
 		r.References["workflow_id"] = ujconfig.Reference{
-			TerraformName: tfWorkflowAlert,
+			TerraformName: tfWorkflowIncident,
 		}
 		r.References["task_params.status_page_id"] = ujconfig.Reference{
 			TerraformName: tfStatusPage,
@@ -207,7 +232,7 @@ func configureWorkflows(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfWorkflowTaskPageRootlyOnCallResponders, func(r *ujconfig.Resource) {
-		r.ShortGroup = "workflow"
+		r.ShortGroup = groupWorkflow
 		r.Kind = "WorkflowTaskPageRootlyOnCallResponders"
 		r.References["workflow_id"] = ujconfig.Reference{
 			TerraformName: tfWorkflowAlert,
@@ -225,7 +250,7 @@ func configureWorkflows(p *ujconfig.Provider) {
 // configureStatusPages covers the page and what is shown on it.
 func configureStatusPages(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfStatusPage, func(r *ujconfig.Resource) {
-		r.ShortGroup = "statuspage"
+		r.ShortGroup = groupStatusPage
 		r.Kind = "StatusPage"
 		// Upstream does not flag the page password as sensitive, which would
 		// put it in the spec and the status in clear. Flagging it here makes
@@ -239,14 +264,14 @@ func configureStatusPages(p *ujconfig.Provider) {
 		}
 	})
 	p.AddResourceConfigurator(tfStatusPageComponentGroup, func(r *ujconfig.Resource) {
-		r.ShortGroup = "statuspage"
+		r.ShortGroup = groupStatusPage
 		r.Kind = "StatusPageComponentGroup"
 		r.References["status_page_id"] = ujconfig.Reference{
 			TerraformName: tfStatusPage,
 		}
 	})
 	p.AddResourceConfigurator(tfStatusPageComponent, func(r *ujconfig.Resource) {
-		r.ShortGroup = "statuspage"
+		r.ShortGroup = groupStatusPage
 		r.Kind = "StatusPageComponent"
 		r.References["status_page_id"] = ujconfig.Reference{
 			TerraformName: tfStatusPage,

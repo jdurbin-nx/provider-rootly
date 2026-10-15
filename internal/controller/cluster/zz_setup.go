@@ -28,6 +28,7 @@ import (
 	statuspagecomponentgroup "github.com/nikogura/provider-rootly/internal/controller/cluster/statuspage/statuspagecomponentgroup"
 	team "github.com/nikogura/provider-rootly/internal/controller/cluster/team/team"
 	workflowalert "github.com/nikogura/provider-rootly/internal/controller/cluster/workflow/workflowalert"
+	workflowincident "github.com/nikogura/provider-rootly/internal/controller/cluster/workflow/workflowincident"
 	workflowtaskcreateincident "github.com/nikogura/provider-rootly/internal/controller/cluster/workflow/workflowtaskcreateincident"
 	workflowtaskpagerootlyoncallresponders "github.com/nikogura/provider-rootly/internal/controller/cluster/workflow/workflowtaskpagerootlyoncallresponders"
 	workflowtaskpublishincident "github.com/nikogura/provider-rootly/internal/controller/cluster/workflow/workflowtaskpublishincident"
@@ -56,6 +57,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		statuspagecomponentgroup.Setup,
 		team.Setup,
 		workflowalert.Setup,
+		workflowincident.Setup,
 		workflowtaskcreateincident.Setup,
 		workflowtaskpagerootlyoncallresponders.Setup,
 		workflowtaskpublishincident.Setup,
@@ -90,6 +92,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		statuspagecomponentgroup.SetupGated,
 		team.SetupGated,
 		workflowalert.SetupGated,
+		workflowincident.SetupGated,
 		workflowtaskcreateincident.SetupGated,
 		workflowtaskpagerootlyoncallresponders.SetupGated,
 		workflowtaskpublishincident.SetupGated,
@@ -123,6 +126,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		statuspagecomponentgroup.SetupWebhookWithManager,
 		team.SetupWebhookWithManager,
 		workflowalert.SetupWebhookWithManager,
+		workflowincident.SetupWebhookWithManager,
 		workflowtaskcreateincident.SetupWebhookWithManager,
 		workflowtaskpagerootlyoncallresponders.SetupWebhookWithManager,
 		workflowtaskpublishincident.SetupWebhookWithManager,

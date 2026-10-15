@@ -198,6 +198,186 @@ func (mg *WorkflowAlert) ResolveReferences(ctx context.Context, c client.Reader)
 	return nil
 }
 
+// ResolveReferences of this WorkflowIncident.
+func (mg *WorkflowIncident) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPINamespacedResolver(c, mg)
+
+	var mrsp reference.MultiNamespacedResolutionResponse
+	var err error
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.ForProvider.FunctionalityIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.FunctionalityIdsRefs,
+		Selector:      mg.Spec.ForProvider.FunctionalityIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.FunctionalityList{},
+			Managed: &v1alpha1.Functionality{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.FunctionalityIds")
+	}
+	mg.Spec.ForProvider.FunctionalityIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.FunctionalityIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.ForProvider.GroupIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.GroupIdsRefs,
+		Selector:      mg.Spec.ForProvider.GroupIdsSelector,
+		To: reference.To{
+			List:    &v1alpha11.TeamList{},
+			Managed: &v1alpha11.Team{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.GroupIds")
+	}
+	mg.Spec.ForProvider.GroupIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.GroupIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.ForProvider.IncidentTypeIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.IncidentTypeIdsRefs,
+		Selector:      mg.Spec.ForProvider.IncidentTypeIdsSelector,
+		To: reference.To{
+			List:    &v1alpha12.IncidentTypeList{},
+			Managed: &v1alpha12.IncidentType{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.IncidentTypeIds")
+	}
+	mg.Spec.ForProvider.IncidentTypeIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.IncidentTypeIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.ForProvider.ServiceIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.ServiceIdsRefs,
+		Selector:      mg.Spec.ForProvider.ServiceIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.ServiceList{},
+			Managed: &v1alpha1.Service{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.ServiceIds")
+	}
+	mg.Spec.ForProvider.ServiceIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.ServiceIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.ForProvider.SeverityIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.ForProvider.SeverityIdsRefs,
+		Selector:      mg.Spec.ForProvider.SeverityIdsSelector,
+		To: reference.To{
+			List:    &v1alpha12.SeverityList{},
+			Managed: &v1alpha12.Severity{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.SeverityIds")
+	}
+	mg.Spec.ForProvider.SeverityIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.SeverityIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.InitProvider.FunctionalityIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.FunctionalityIdsRefs,
+		Selector:      mg.Spec.InitProvider.FunctionalityIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.FunctionalityList{},
+			Managed: &v1alpha1.Functionality{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.FunctionalityIds")
+	}
+	mg.Spec.InitProvider.FunctionalityIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.FunctionalityIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.InitProvider.GroupIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.GroupIdsRefs,
+		Selector:      mg.Spec.InitProvider.GroupIdsSelector,
+		To: reference.To{
+			List:    &v1alpha11.TeamList{},
+			Managed: &v1alpha11.Team{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.GroupIds")
+	}
+	mg.Spec.InitProvider.GroupIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.GroupIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.InitProvider.IncidentTypeIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.IncidentTypeIdsRefs,
+		Selector:      mg.Spec.InitProvider.IncidentTypeIdsSelector,
+		To: reference.To{
+			List:    &v1alpha12.IncidentTypeList{},
+			Managed: &v1alpha12.IncidentType{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.IncidentTypeIds")
+	}
+	mg.Spec.InitProvider.IncidentTypeIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.IncidentTypeIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.InitProvider.ServiceIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.ServiceIdsRefs,
+		Selector:      mg.Spec.InitProvider.ServiceIdsSelector,
+		To: reference.To{
+			List:    &v1alpha1.ServiceList{},
+			Managed: &v1alpha1.Service{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.ServiceIds")
+	}
+	mg.Spec.InitProvider.ServiceIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.ServiceIdsRefs = mrsp.ResolvedReferences
+
+	mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+		CurrentValues: reference.FromPtrValues(mg.Spec.InitProvider.SeverityIds),
+		Extract:       reference.ExternalName(),
+		Namespace:     mg.GetNamespace(),
+		References:    mg.Spec.InitProvider.SeverityIdsRefs,
+		Selector:      mg.Spec.InitProvider.SeverityIdsSelector,
+		To: reference.To{
+			List:    &v1alpha12.SeverityList{},
+			Managed: &v1alpha12.Severity{},
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.SeverityIds")
+	}
+	mg.Spec.InitProvider.SeverityIds = reference.ToPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.SeverityIdsRefs = mrsp.ResolvedReferences
+
+	return nil
+}
+
 // ResolveReferences of this WorkflowTaskCreateIncident.
 func (mg *WorkflowTaskCreateIncident) ResolveReferences(ctx context.Context, c client.Reader) error {
 	r := reference.NewAPINamespacedResolver(c, mg)
@@ -568,8 +748,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 		Reference:    mg.Spec.ForProvider.WorkflowIDRef,
 		Selector:     mg.Spec.ForProvider.WorkflowIDSelector,
 		To: reference.To{
-			List:    &WorkflowAlertList{},
-			Managed: &WorkflowAlert{},
+			List:    &WorkflowIncidentList{},
+			Managed: &WorkflowIncident{},
 		},
 	})
 	if err != nil {
@@ -623,8 +803,8 @@ func (mg *WorkflowTaskPublishIncident) ResolveReferences(ctx context.Context, c 
 		Reference:    mg.Spec.InitProvider.WorkflowIDRef,
 		Selector:     mg.Spec.InitProvider.WorkflowIDSelector,
 		To: reference.To{
-			List:    &WorkflowAlertList{},
-			Managed: &WorkflowAlert{},
+			List:    &WorkflowIncidentList{},
+			Managed: &WorkflowIncident{},
 		},
 	})
 	if err != nil {

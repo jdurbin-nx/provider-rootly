@@ -314,7 +314,7 @@ spec:
                     description: The ID of the parent workflow
                     type: string
                   workflowIdRef:
-                    description: Reference to a WorkflowAlert in workflow to populate
+                    description: Reference to a WorkflowIncident in workflow to populate
                       workflowId.
                     properties:
                       name:
@@ -352,7 +352,7 @@ spec:
                     - name
                     type: object
                   workflowIdSelector:
-                    description: Selector for a WorkflowAlert in workflow to populate
+                    description: Selector for a WorkflowIncident in workflow to populate
                       workflowId.
                     properties:
                       matchControllerRef:
@@ -663,7 +663,7 @@ spec:
                     description: The ID of the parent workflow
                     type: string
                   workflowIdRef:
-                    description: Reference to a WorkflowAlert in workflow to populate
+                    description: Reference to a WorkflowIncident in workflow to populate
                       workflowId.
                     properties:
                       name:
@@ -701,7 +701,7 @@ spec:
                     - name
                     type: object
                   workflowIdSelector:
-                    description: Selector for a WorkflowAlert in workflow to populate
+                    description: Selector for a WorkflowIncident in workflow to populate
                       workflowId.
                     properties:
                       matchControllerRef:

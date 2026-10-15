@@ -31,14 +31,14 @@ type WorkflowTaskPublishIncidentInitParameters struct {
 	TaskParams []WorkflowTaskPublishIncidentTaskParamsInitParameters `json:"taskParams,omitempty" tf:"task_params,omitempty"`
 
 	// The ID of the parent workflow
-	// +crossplane:generate:reference:type=github.com/nikogura/provider-rootly/apis/namespaced/workflow/v1alpha1.WorkflowAlert
+	// +crossplane:generate:reference:type=github.com/nikogura/provider-rootly/apis/namespaced/workflow/v1alpha1.WorkflowIncident
 	WorkflowID *string `json:"workflowId,omitempty" tf:"workflow_id,omitempty"`
 
-	// Reference to a WorkflowAlert in workflow to populate workflowId.
+	// Reference to a WorkflowIncident in workflow to populate workflowId.
 	// +kubebuilder:validation:Optional
 	WorkflowIDRef *v2.NamespacedReference `json:"workflowIdRef,omitempty" tf:"-"`
 
-	// Selector for a WorkflowAlert in workflow to populate workflowId.
+	// Selector for a WorkflowIncident in workflow to populate workflowId.
 	// +kubebuilder:validation:Optional
 	WorkflowIDSelector *v2.NamespacedSelector `json:"workflowIdSelector,omitempty" tf:"-"`
 }
@@ -89,15 +89,15 @@ type WorkflowTaskPublishIncidentParameters struct {
 	TaskParams []WorkflowTaskPublishIncidentTaskParamsParameters `json:"taskParams,omitempty" tf:"task_params,omitempty"`
 
 	// The ID of the parent workflow
-	// +crossplane:generate:reference:type=github.com/nikogura/provider-rootly/apis/namespaced/workflow/v1alpha1.WorkflowAlert
+	// +crossplane:generate:reference:type=github.com/nikogura/provider-rootly/apis/namespaced/workflow/v1alpha1.WorkflowIncident
 	// +kubebuilder:validation:Optional
 	WorkflowID *string `json:"workflowId,omitempty" tf:"workflow_id,omitempty"`
 
-	// Reference to a WorkflowAlert in workflow to populate workflowId.
+	// Reference to a WorkflowIncident in workflow to populate workflowId.
 	// +kubebuilder:validation:Optional
 	WorkflowIDRef *v2.NamespacedReference `json:"workflowIdRef,omitempty" tf:"-"`
 
-	// Selector for a WorkflowAlert in workflow to populate workflowId.
+	// Selector for a WorkflowIncident in workflow to populate workflowId.
 	// +kubebuilder:validation:Optional
 	WorkflowIDSelector *v2.NamespacedSelector `json:"workflowIdSelector,omitempty" tf:"-"`
 }

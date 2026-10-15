@@ -17,6 +17,15 @@ func (l *WorkflowAlertList) GetItems() []resource.Managed {
 	return items
 }
 
+// GetItems of this WorkflowIncidentList.
+func (l *WorkflowIncidentList) GetItems() []resource.Managed {
+	items := make([]resource.Managed, len(l.Items))
+	for i := range l.Items {
+		items[i] = &l.Items[i]
+	}
+	return items
+}
+
 // GetItems of this WorkflowTaskCreateIncidentList.
 func (l *WorkflowTaskCreateIncidentList) GetItems() []resource.Managed {
 	items := make([]resource.Managed, len(l.Items))
