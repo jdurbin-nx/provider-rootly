@@ -1,0 +1,109 @@
+From: Nik Ogura <nik.ogura@gmail.com>
+Subject: [PATCH] client: send a workflow task's workflow id in the URL only
+
+The create and update endpoints for workflow tasks address the workflow by
+the request URL and reject a body that repeats it as the workflow_id
+attribute. The body is built from a copy of the task with that field
+cleared; the caller's task keeps it for the URL.
+
+---
+diff --git a/client/workflow_tasks.go b/client/workflow_tasks.go
+--- a/client/workflow_tasks.go
++++ b/client/workflow_tasks.go
+@@ -4,6 +4,7 @@ import (
+ 	"reflect"
+ 
+ 	"fmt"
++	"io"
+ 
+ 	"github.com/google/jsonapi"
+ 	rootlygo "github.com/rootlyhq/terraform-provider-rootly/v5/schema"
+@@ -38,8 +39,19 @@ func (c *Client) ListWorkflowTasks(id string, params *rootlygo.ListWorkflowTasks
+ 	return workflow_tasks, nil
+ }
+ 
++// marshalWorkflowTask marshals a task for a create or update request. The
++// task's workflow is addressed by the request URL, and the API rejects a
++// body that names it again as an attribute, so the body is built from a
++// copy with the workflow id cleared.
++func marshalWorkflowTask(i *WorkflowTask) (body io.Reader, err error) {
++	task := *i
++	task.WorkflowId = ""
++	body, err = MarshalData(&task)
++	return body, err
++}
++
+ func (c *Client) CreateWorkflowTask(i *WorkflowTask) (*WorkflowTask, error) {
+-	buffer, err := MarshalData(i)
++	buffer, err := marshalWorkflowTask(i)
+ 	if err != nil {
+ 		return nil, fmt.Errorf("Error marshaling workflow_task: %w", err)
+ 	}
+@@ -80,7 +92,7 @@ func (c *Client) GetWorkflowTask(id string) (*WorkflowTask, error) {
+ 	return data.(*WorkflowTask), nil
+ }
+ 
+ func (c *Client) UpdateWorkflowTask(id string, i *WorkflowTask) (*WorkflowTask, error) {
+-	buffer, err := MarshalData(i)
++	buffer, err := marshalWorkflowTask(i)
+ 	if err != nil {
+ 		return nil, fmt.Errorf("Error marshaling workflow_task: %w", err)
+diff --git a/client/workflow_tasks_test.go b/client/workflow_tasks_test.go
+new file mode 100644
+--- /dev/null
++++ b/client/workflow_tasks_test.go
+@@ -0,0 +1,54 @@
++package client
++
++import (
++	"encoding/json"
++	"io"
++	"testing"
++)
++
++func workflowTaskAttrs(t *testing.T, body io.Reader) (attrs map[string]interface{}) {
++	t.Helper()
++	raw, err := io.ReadAll(body)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var payload struct {
++		Data struct {
++			Attributes map[string]interface{} `json:"attributes"`
++		} `json:"data"`
++	}
++	err = json.Unmarshal(raw, &payload)
++	if err != nil {
++		t.Fatal(err)
++	}
++	attrs = payload.Data.Attributes
++	return attrs
++}
++
++// The workflow is addressed by the URL of a create or update; the API
++// rejects a body that repeats it as workflow_id.
++func TestMarshalWorkflowTaskOmitsWorkflowID(t *testing.T) {
++	t.Parallel()
++
++	task := &WorkflowTask{
++		WorkflowId: "7ccf5473-d697-4d08-8a4d-62fdfb809ae9",
++		Name:       "Publish to status page",
++		TaskParams: map[string]interface{}{"task_type": "publish_incident"},
++	}
++
++	body, err := marshalWorkflowTask(task)
++	if err != nil {
++		t.Fatal(err)
++	}
++	attrs := workflowTaskAttrs(t, body)
++
++	if _, found := attrs["workflow_id"]; found {
++		t.Errorf("body attributes carry workflow_id: %v", attrs)
++	}
++	if attrs["name"] != "Publish to status page" {
++		t.Errorf("name = %v, want the task name", attrs["name"])
++	}
++	if task.WorkflowId == "" {
++		t.Error("marshaling cleared the caller's workflow id, which the request URL still needs")
++	}
++}

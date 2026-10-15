@@ -1,3 +1,27 @@
+# The upstream Terraform provider is built from source at the pinned tag, with
+# the patches in patches/ applied, instead of taken from its release. Each
+# patch carries its own test, run here, so a patch that no longer does what it
+# says fails the image build. Drop a patch once upstream ships the fix.
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS tfprovider
+RUN apk --no-cache add git
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TERRAFORM_PROVIDER_REPO
+ARG TERRAFORM_PROVIDER_VERSION
+ARG TERRAFORM_NATIVE_PROVIDER_BINARY
+
+WORKDIR /src
+RUN git clone -c advice.detachedHead=false --depth 1 --branch "v${TERRAFORM_PROVIDER_VERSION}" "${TERRAFORM_PROVIDER_REPO}" .
+COPY patches/ /patches/
+RUN git apply --verbose /patches/*.patch
+
+RUN go test ./client/ -run 'TestMarshalWorkflowTask'
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath \
+      -ldflags "-s -w -X github.com/rootlyhq/terraform-provider-rootly/v5/meta.version=${TERRAFORM_PROVIDER_VERSION}" \
+      -o "/out/${TERRAFORM_NATIVE_PROVIDER_BINARY}" .
+
 FROM alpine:3.23.4
 RUN apk --no-cache add ca-certificates bash
 
@@ -14,9 +38,7 @@ ENV USER_ID=65532
 ARG TERRAFORM_VERSION
 ARG TERRAFORM_PROVIDER_SOURCE
 ARG TERRAFORM_PROVIDER_VERSION
-ARG TERRAFORM_PROVIDER_DOWNLOAD_NAME
 ARG TERRAFORM_NATIVE_PROVIDER_BINARY
-ARG TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX
 
 ## End of - Provider-dependent configuration
 
@@ -27,15 +49,13 @@ ENV TF_FORK=0
 RUN mkdir -p ${PLUGIN_DIR}
 
 ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${TARGETOS}_${TARGETARCH}.zip /tmp
-ADD ${TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX}/${TERRAFORM_PROVIDER_DOWNLOAD_NAME}_${TERRAFORM_PROVIDER_VERSION}_${TARGETOS}_${TARGETARCH}.zip /tmp
+COPY --from=tfprovider /out/${TERRAFORM_NATIVE_PROVIDER_BINARY} ${PLUGIN_DIR}/
 ADD terraformrc.hcl ${TF_CLI_CONFIG_FILE}
 
 RUN unzip /tmp/terraform_${TERRAFORM_VERSION}_${TARGETOS}_${TARGETARCH}.zip -d /usr/local/bin \
   && chmod +x /usr/local/bin/terraform \
   && rm /tmp/terraform_${TERRAFORM_VERSION}_${TARGETOS}_${TARGETARCH}.zip \
-  && unzip /tmp/${TERRAFORM_PROVIDER_DOWNLOAD_NAME}_${TERRAFORM_PROVIDER_VERSION}_${TARGETOS}_${TARGETARCH}.zip -d ${PLUGIN_DIR} \
   && chmod +x ${PLUGIN_DIR}/* \
-  && rm /tmp/${TERRAFORM_PROVIDER_DOWNLOAD_NAME}_${TERRAFORM_PROVIDER_VERSION}_${TARGETOS}_${TARGETARCH}.zip \
   && chown -R ${USER_ID}:${USER_ID} /terraform
 # End of - Setup Terraform environment
 

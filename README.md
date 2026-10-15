@@ -169,6 +169,19 @@ The generation inputs are pinned in the Makefile
 (`TERRAFORM_PROVIDER_VERSION`); bumping the upstream provider version is a
 version bump plus `make generate`, then read the diff.
 
+### Upstream Patches
+
+The image builds the upstream Terraform provider from source at the pinned
+tag rather than taking its release binary, so that the patches in
+`cluster/images/provider-rootly/patches/` can be applied. Each patch is a
+fix upstream does not have yet, carries its own test, and is run before the
+build, so a patch that stops doing what it says fails the image build. When
+upstream ships the fix, delete the patch and bump the version.
+
+| Patch | Fixes | Upstream |
+|---|---|---|
+| `0001-workflow-task-workflow-id-in-url-only` | Every `WorkflowTask*` create and update was rejected with `400 this endpoint does not accept workflow_id`: the client sent the workflow id in the body as well as the URL. | [rootlyhq/terraform-provider-rootly#525](https://github.com/rootlyhq/terraform-provider-rootly/issues/525) |
+
 ## License
 
 Apache-2.0. At runtime the provider drives the MPL-2.0

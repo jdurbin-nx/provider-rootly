@@ -13,8 +13,6 @@ TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAF
 export TERRAFORM_PROVIDER_SOURCE ?= rootlyhq/rootly
 export TERRAFORM_PROVIDER_REPO ?= https://github.com/rootlyhq/terraform-provider-rootly
 export TERRAFORM_PROVIDER_VERSION ?= 5.20.1
-export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-rootly
-export TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX ?= https://github.com/rootlyhq/terraform-provider-rootly/releases/download/v$(TERRAFORM_PROVIDER_VERSION)
 export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-rootly_v$(TERRAFORM_PROVIDER_VERSION)
 export TERRAFORM_DOCS_PATH ?= docs/resources
 
