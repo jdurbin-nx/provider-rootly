@@ -6,6 +6,11 @@ This project is licensed under the Apache License 2.0.
 It is generated with Upjet (Apache-2.0) from the schema of, and at runtime
 executes, the Rootly Terraform provider
 (https://github.com/rootlyhq/terraform-provider-rootly), which is licensed
-under the Mozilla Public License 2.0. The Terraform provider binary is
-included in the container image unmodified; its source is available at the
-repository above.
+under the Mozilla Public License 2.0.
+
+The container image builds that provider from source at the tag pinned in
+the Makefile, with the patches in cluster/images/provider-rootly/patches/
+applied. Those patches modify MPL-2.0 covered files and are themselves
+offered under the Mozilla Public License 2.0; this repository is the
+source for them. Unmodified upstream source is available at the repository
+above.

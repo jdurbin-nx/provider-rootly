@@ -185,5 +185,6 @@ upstream ships the fix, delete the patch and bump the version.
 ## License
 
 Apache-2.0. At runtime the provider drives the MPL-2.0
-`terraform-provider-rootly` binary, which is downloaded unmodified at image
-build; see NOTICE.
+`terraform-provider-rootly` binary, built from upstream source at image build
+with the patches above applied. The patches are MPL-2.0, as the files they
+change are; see NOTICE.
