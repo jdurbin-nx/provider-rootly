@@ -44,3 +44,32 @@ func TestLateInitializeSkipsConflictingAlertBlocks(t *testing.T) {
 	assert.Nil(t, tr.Spec.ForProvider.AlertTemplateAttributes, "alert_template_attributes must not be late-initialized")
 	assert.Nil(t, tr.Spec.ForProvider.AlertSourceFieldsAttributes, "alert_source_fields_attributes must not be late-initialized")
 }
+
+// TestLateInitializeSkipsConnectionStatus guards against an AlertsSource that
+// updates itself on every reconcile.
+//
+// Rootly reports status as setup_incomplete at creation and moves it to
+// connected once alerts arrive. Copied into the spec, the creation-time value
+// would be sent back on every reconcile. status must not be late-initialized.
+func TestLateInitializeSkipsConnectionStatus(t *testing.T) {
+	t.Parallel()
+
+	name := "alertmanager-prod"
+	tr := &AlertsSource{}
+	tr.Spec.ForProvider.Name = &name
+
+	observed := []byte(`{
+		"name": "alertmanager-prod",
+		"source_type": "alertmanager",
+		"status": "setup_incomplete"
+	}`)
+
+	changed, err := tr.LateInitialize(observed)
+	require.NoError(t, err)
+
+	assert.True(t, changed, "fields Rootly does not own are still late-initialized")
+	require.NotNil(t, tr.Spec.ForProvider.SourceType)
+	assert.Equal(t, "alertmanager", *tr.Spec.ForProvider.SourceType)
+
+	assert.Nil(t, tr.Spec.ForProvider.Status, "status must not be late-initialized")
+}

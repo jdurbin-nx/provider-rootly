@@ -182,10 +182,40 @@ func TestConfigureFieldHandling(t *testing.T) {
 
 	p := configuredProvider(t)
 
-	ignored := p.Resources[tfAlertsSource].LateInitializer.IgnoredFields
-	assert.ElementsMatch(t, []string{"alert_template_attributes", "alert_source_fields_attributes"}, ignored,
-		"the conflicting AlertsSource blocks must not be late-initialized")
-
 	password := p.Resources[tfStatusPage].TerraformResource.Schema["authentication_password"]
 	assert.True(t, password.Sensitive, "the status page password must be a secret reference, not a spec field")
+}
+
+// Fields Rootly owns and changes on its own must never be late-initialized:
+// a copied value goes stale the next time Rootly moves it, and every
+// reconcile would then send an update to put the old value back.
+func TestConfigureLateInitIgnoredFields(t *testing.T) {
+	t.Parallel()
+
+	p := configuredProvider(t)
+
+	tests := []struct {
+		name     string
+		resource string
+		ignored  []string
+	}{
+		{name: "EscalationPolicy", resource: tfEscalationPolicy, ignored: []string{"created_by_user_id", "last_updated_by_user_id"}},
+		{name: "Heartbeat", resource: tfHeartbeat, ignored: []string{"last_pinged_at", "expires_at", "status"}},
+		{name: "AlertsSource", resource: tfAlertsSource, ignored: []string{"alert_template_attributes", "alert_source_fields_attributes", "status"}},
+		{name: "AlertUrgency", resource: tfAlertUrgency, ignored: []string{"deleted_at"}},
+		{name: "StatusPageComponent", resource: tfStatusPageComponent, ignored: []string{"name", "description", "status"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			r := p.Resources[tt.resource]
+			assert.ElementsMatch(t, tt.ignored, r.LateInitializer.IgnoredFields)
+			for _, field := range tt.ignored {
+				_, ok := r.TerraformResource.Schema[field]
+				assert.True(t, ok, "%s has no attribute %q to ignore", tt.resource, field)
+			}
+		})
+	}
 }

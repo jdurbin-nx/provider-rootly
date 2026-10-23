@@ -59,6 +59,16 @@ late-initialized, so the spec carries only the one you declare. If an
 provider release late-initialized the other block into its spec: remove the
 block you do not manage from `spec.forProvider` and it reconciles again.
 
+Fields Rootly owns and changes on its own are not late-initialized, so the
+provider never sends a stale copy back: `lastPingedAt`, `expiresAt` and `status`
+on a `Heartbeat`, `status` on an `AlertsSource`, `name`, `description` and
+`status` on a `StatusPageComponent`, `createdByUserId` and
+`lastUpdatedByUserId` on an `EscalationPolicy`, and `deletedAt` on an
+`AlertUrgency`. They stay visible in `status.atProvider`. If one of these
+resources updates on every reconcile, an earlier provider release
+late-initialized the field into its spec: remove it from `spec.forProvider`
+once and the updates stop.
+
 ### From An Alert To A Status Page
 
 The kinds compose into one flow, every link by name:
