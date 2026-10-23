@@ -34,6 +34,13 @@ func configureOnCall(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfEscalationPolicy, func(r *ujconfig.Resource) {
 		r.ShortGroup = groupEscalation
 		r.Kind = "EscalationPolicy"
+		// Who created and who last edited the policy are Rootly's audit
+		// record. Once late-initialized, the first edit made outside the
+		// provider leaves the spec stale, and every reconcile would send the
+		// old user ids back.
+		r.LateInitializer = ujconfig.LateInitializer{
+			IgnoredFields: []string{"created_by_user_id", "last_updated_by_user_id"},
+		}
 	})
 	p.AddResourceConfigurator(tfEscalationLevel, func(r *ujconfig.Resource) {
 		r.ShortGroup = groupEscalation
@@ -71,6 +78,13 @@ func configureOnCall(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfHeartbeat, func(r *ujconfig.Resource) {
 		r.ShortGroup = groupHeartbeat
 		r.Kind = "Heartbeat"
+		// Rootly moves last_pinged_at and expires_at forward on every ping
+		// and derives status from them. Late-initialized, they go stale with
+		// the next ping, and every reconcile would send an update to put the
+		// old timestamps back. They stay in status.atProvider.
+		r.LateInitializer = ujconfig.LateInitializer{
+			IgnoredFields: []string{"last_pinged_at", "expires_at", "status"},
+		}
 	})
 }
 
@@ -84,8 +98,12 @@ func configureAlerting(p *ujconfig.Provider) {
 		// as one empty element when the API has none. Late-initializing
 		// either would put both in the spec and have every later refresh
 		// rejected. What the user declares is what is sent.
+		//
+		// status is Rootly's view of the integration: setup_incomplete at
+		// creation, connected once alerts arrive. Late-initialized, it would
+		// pin the creation-time value and every reconcile would send it back.
 		r.LateInitializer = ujconfig.LateInitializer{
-			IgnoredFields: []string{"alert_template_attributes", "alert_source_fields_attributes"},
+			IgnoredFields: []string{"alert_template_attributes", "alert_source_fields_attributes", "status"},
 		}
 	})
 	p.AddResourceConfigurator(tfAlertRoute, func(r *ujconfig.Resource) {
@@ -108,6 +126,10 @@ func configureAlerting(p *ujconfig.Provider) {
 	p.AddResourceConfigurator(tfAlertUrgency, func(r *ujconfig.Resource) {
 		r.ShortGroup = groupAlerts
 		r.Kind = "AlertUrgency"
+		// deleted_at is Rootly's soft-delete timestamp, never an input.
+		r.LateInitializer = ujconfig.LateInitializer{
+			IgnoredFields: []string{"deleted_at"},
+		}
 	})
 }
 
@@ -284,6 +306,17 @@ func configureStatusPages(p *ujconfig.Provider) {
 		// the Rootly id in sourceId.
 		r.References["source_id"] = ujconfig.Reference{
 			TerraformName: tfService,
+		}
+		// A catalog-backed component takes its name and description from
+		// its source, and Rootly computes its status. Late-initialized, a
+		// rename of the source or a status change would leave the spec
+		// stale, and every reconcile would send the old values back -- for
+		// status, an attempt to put a component Rootly marked as degraded
+		// back to operational. An ad-hoc component still sets name and
+		// description in its spec; they are only no longer copied in from
+		// Rootly.
+		r.LateInitializer = ujconfig.LateInitializer{
+			IgnoredFields: []string{"name", "description", "status"},
 		}
 	})
 }

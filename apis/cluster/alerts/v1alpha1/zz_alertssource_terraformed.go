@@ -120,6 +120,7 @@ func (tr *AlertsSource) LateInitialize(attrs []byte) (bool, error) {
 	opts := []resource.GenericLateInitializerOption{resource.WithZeroValueJSONOmitEmptyFilter(resource.CNameWildcard)}
 	opts = append(opts, resource.WithNameFilter("AlertSourceFieldsAttributes"))
 	opts = append(opts, resource.WithNameFilter("AlertTemplateAttributes"))
+	opts = append(opts, resource.WithNameFilter("Status"))
 
 	li := resource.NewGenericLateInitializer(opts...)
 	return li.LateInitialize(&tr.Spec.ForProvider, params)
