@@ -184,6 +184,9 @@ func TestConfigureFieldHandling(t *testing.T) {
 
 	password := p.Resources[tfStatusPage].TerraformResource.Schema["authentication_password"]
 	assert.True(t, password.Sensitive, "the status page password must be a secret reference, not a spec field")
+
+	secret := p.Resources[tfHeartbeat].TerraformResource.Schema["secret"]
+	assert.True(t, secret.Sensitive, "the heartbeat ping token must go to the connection secret, not the status")
 }
 
 // Fields Rootly owns and changes on its own must never be late-initialized:
